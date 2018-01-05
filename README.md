@@ -1,2 +1,2 @@
-# ELEC391
-ELEC391 Laser Lightshow
+# ELEC391 Controller
+ELEC391 Laser Lightshow Controller
