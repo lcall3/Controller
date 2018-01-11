@@ -34,7 +34,7 @@ Distance   	= 1;          	% Distance from laser to screen      	(m)
 JointX		= 1;			% Horizontal displacement from Motor 0 	(m)
 JointY 		= 1;			% Vertical displacement from Motor 0	(m)
 
-Width_Laser = 0.01;			% Diameter of laser 					(m)
+Width_laser = 0.01;			% Diameter of laser 					(m)
 
 % Material & Spring Constant
 RhoJoint   	= 1;           	% Density of Joint Material
@@ -48,50 +48,63 @@ uSF    = 700;            	% (um) = (uNm/N)
 JntLim = 180;             % Q1 only (deg)
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Indices into MotorParam Vector for Maxon motors %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Values at Nominal Voltage
-NomV          = 1;
-NoLoadSpd     = 2;
-NoLoadCurr    = 3;
-NomSpd        = 4;
-NomTorque     = 5;
-NomCurr       = 6;
-StallTorque   = 7;
-StallCurr     = 8;
-MaxEff        = 9;
+%%%%%%%%%%%%%%%%%%
+% Motor 0		 %
+%%%%%%%%%%%%%%%%%%
 
-% Characteristics
-TermR         = 10;
-TermL         = 11;
-TorqueK       = 12;
-SpdK          = 13;
-SpdTorqueGrad = 14;
-MechTimeK     = 15;
-RotJ          = 16;
+NomI0   = 3.2;                 					% Max average current
+StallI0 = 6.031;                				% Max peak current (A)
+V_nom0 	= 12;
 
-% Thermal Data
-ThermRhous    = 17;
-ThermRwind    = 18;
-ThermTCwind   = 19;
-ThermTCmot    = 20;
-AmbTemp       = 21;
-MaxTemp       = 22;
+Diam_m0	 		= 0.03;       							% Motor Diameter (m)
+r_m0 			= Diam_m0 / 2;							% Motor Radius (m)
+Length_m0 		= 0.047;             					% Motor Length (m)
+%% Find weight!!
+Weight_m0		= 0.05;             					% Motor Weight (kg)
 
-% Mechanical Data
-MaxSpdBall    = 23;
-AxialPlayBall = 24;
-RadPlayBall   = 25;
-MaxAxLdBall   = 26;
-MaxFBall      = 27;
-MaxRadLdBall  = 28;
+J_rotor0			= Sml;
 
-% Other Specifications
-NoPolePair    = 29;
-NoCommSeg     = 30;
-Weight        = 31;
+% Armature Resistance and Inductance
+R_a0 = 1.75;										% Ohms
+L_a0 = 0.00112;										% H
 
-% Physical Dimensions
-OuterDiam     = 32;
-Length        = 33;
+% Torque Constant
+K_T0 = 	157.45/1000;								% Convert from mNm/A to (Nm/A)
+
+% Back EMF Constant
+K_B0 = 93.31*RadPSecPerRPM;							% Convert rmp/V to ((rad/s)/V)
+
+% No load values
+I_noload0 = 0.19;									% A
+w_noload0 = 7200 * RadPSecPerRPM;					% Convert from rmp to rad/s
+
+
+%%%%%%%%%%%%%%%%%%
+% Motor 1		 %
+%%%%%%%%%%%%%%%%%%
+
+NomI1   = 3.2;                 					% Max average current
+StallI1 = 6.031;                				% Max peak current (A)
+V_nom1 	= 12;
+
+Diam_m1	 		= 0.03;       							% Motor Diameter (m)
+r_m1 			= Diam_m1 / 2;							% Motor Radius (m)
+Length_m1 		= 0.047;             					% Motor Length (m)
+%% Find weight!!
+Weight_m1		= 0.05;             					% Motor Weight (kg)
+
+J_rotor1			= Sml;
+
+% Armature Resistance and Inductance
+R_a1 = 1.75;										% Ohms
+L_a1 = 0.00112;										% H
+
+% Torque Constant
+K_T1 = 	157.45/1000;								% Convert from mNm/A to (Nm/A)
+
+% Back EMF Constant
+K_B1 = 93.31*RadPSecPerRPM;							% Convert rmp/V to ((rad/s)/V)
+
+% No load values
+I_noload1 = 0.19;									% A
+w_noload1 = 7200 * RadPSecPerRPM;					% Convert from rmp to rad/s
