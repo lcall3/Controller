@@ -25,34 +25,27 @@ Sml = 1e-6;             % General purpose small number
 % Simulation Execution Time
 TotalTime = 20;          % (s)
 
-% Amplifier
-R1  = 2.2;               % (Mohm)
-R2  = 5.9;               % (ohm)
-C   = 16;                % (uF)
-L   = 120;               % (mH)
-
 % Sensor
-SensV   = 5;             % Min/Max sensor outpout voltage     (V)
-SensAng = 180;           % Min/Max sensor angle               (deg)
+SensV   = 5;             	% Min/Max sensor outpout voltage     (V)
+SensAng = 180;           	% Min/Max sensor angle               (deg)
 
 % Geometry
-Height   = 200;          % Height above build plate           (mm)
-LinkR1   = 16;           % Inner radius of wrist frame        (mm)
-LinkR2   = 22;           % Outer radius of wrist frame        (mm)
-LinkD    = 5;            % Depth of wrist frame               (mm)
-LinkOff  = 9;            % Distance from motor face to centre (mm)
+Distance   	= 1;          	% Distance from laser to screen      	(m)
+JointX		= 1;			% Horizontal displacement from Motor 0 	(m)
+JointY 		= 1;			% Vertical displacement from Motor 0	(m)
+
+Width_Laser = 0.01;			% Diameter of laser 					(m)
 
 % Material & Spring Constant
-RhoAl   = 2.7;           % Density of 6061 Al (g/cm^3)
-SpringK = 7;             % (mNm/rev)
+RhoJoint   	= 1;           	% Density of Joint Material
 
 % Coeff of static friction
 % Amount of torque required to set a body in motion which has a given
 % amount of radial force being applied to it (usually due to gravity)
-uSF    = 700;            % (um) = (uNm/N)
+uSF    = 700;            	% (um) = (uNm/N)
 
 % Joint Limit
-JntLim = 60;             % Q1 only (deg)
+JntLim = 180;             % Q1 only (deg)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
