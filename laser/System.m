@@ -17,17 +17,11 @@ J_motor = (1 / 12) * Weight_2 * (3 * r_m0^2 + (Length_m0 + Width_laser)^2) - (1 
 
 J_system = J_motor + J_rotor0;
 
-
-
-% ==========================
-% Friction Calculations
-% ==========================
-
 % Static Friction
 F_sf = 0;
 
 % Kinetic Friction
-F_kf = 2 * K_T0 * I_noload0 / w_noload0;					% Kinetic friction = torque / speed 
+F_kf = K_T0 * I_noload0 / w_noload0;					% Kinetic friction = torque / speed 
 															% No load condition implies input torque = torque lost to friction
 % =============================
 % Q0 : Rotation about y-axis
@@ -39,7 +33,7 @@ Amp0d   = [1];               			% Denominator
 AmpSat0 = V_nom0;						% Amplifier saturates at nominal voltage of motor
 
 % Electrical Motor Dynamics
-Elec0n  = [1];               					% Numerator
+Elec0n  = [1];               						% Numerator
 Elec0d  = [L_a0 R_a0];              	 			% Denominator
 
 % Torque Const & Back EMF
@@ -68,18 +62,10 @@ K_FB0 = 1;
 % ==========================
 
 
-% ==========================
-% Friction Calculations
-% ==========================
-
-
-
 % Kinetic Friction
 F_kf = K_T1 * I_noload1 / w_noload1;			% Kinetic friction = torque / speed 
 												% No load condition implies input torque = torque lost to friction
 	
-
-
 % =============================
 % Q1 : Rotation about x-axis
 % =============================
@@ -87,7 +73,7 @@ F_kf = K_T1 * I_noload1 / w_noload1;			% Kinetic friction = torque / speed
 % Amplifier Dynamics
 Amp1n   = Amp0n;               					% Numerator
 Amp1d   = Amp0d;               					% Denominator
-AmpSat1 = Big;
+AmpSat1 = V_nom0;
 
 % Electrical Motor Dynamics
 Elec1n = [1];                					% Numerator
@@ -111,3 +97,36 @@ StFric1 = 0;									% Mass of rotor is negligible
 
 K_FB1 = 1;
 
+
+% ==========================================
+% Transfer Functions
+% ==========================================
+
+% Amplifier Transfer Function
+tf_amp0 = tf(Amp0n, Amp0d);
+tf_amp1 = tf(Amp1n, Amp1d);
+
+% Electrical Dynamics Transfer Function
+tf_elec0 = tf(Elec0n, Elec0d);
+tf_elec1 = tf(Elec1n, Elec1d);
+
+% Mechanical Dynamics Transfer Functions
+tf_mech0 = tf(Mech0n, Mech0d);
+tf_mech1 = tf(Mech1n, Mech1d);
+
+% The open loop transfer function maps voltage to radians/s
+% Motor 0
+g_q0 = tf_elec0 * TConst0 * tf_mech0;
+h_q0 = BackEMF0;
+oltf_q0 = tf_amp0 * (g_q0 / (1 + g_q0 * h_q0)) / tf('s'); 
+
+% Simplified 
+ol_q0 = zpk(minreal(oltf_q0));
+
+% Motor 1
+g_q1 = tf_elec1 * TConst1 * tf_mech1;
+h_q1 = BackEMF1;
+oltf_q1 = tf_amp1 * (g_q1 / (1 + g_q1 * h_q1)) / tf('s');
+
+% Simplified 
+ol_q1 = zpk(minreal(oltf_q1));
