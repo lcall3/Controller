@@ -47,37 +47,8 @@ uSF    = 700;            	% (um) = (uNm/N)
 % Joint Limit
 JntLim = 180;             % Q1 only (deg)
 
-
-%%%%%%%%%%%%%%%%%%
-% Motor 0		 %
-%%%%%%%%%%%%%%%%%%
-
-NomI0   = 3.2;                 					% Max average current
-StallI0 = 6.031;                				% Max peak current (A)
-V_nom0 	= 12;
-
-Diam_m0	 		= 0.03;       							% Motor Diameter (m)
-r_m0 			= Diam_m0 / 2;							% Motor Radius (m)
-Length_m0 		= 0.047;             					% Motor Length (m)
-%% Find weight!!
-Weight_m0		= 0.05;             					% Motor Weight (kg)
-
-J_rotor0			= Sml;
-
-% Armature Resistance and Inductance
-R_a0 = 1.75;										% Ohms
-L_a0 = 0.00112;										% H
-
-% Torque Constant
-K_T0 = 	157.45/1000;								% Convert from mNm/A to (Nm/A)
-
-% Back EMF Constant
-K_B0 = 93.31*RadPSecPerRPM;							% Convert rmp/V to ((rad/s)/V)
-
-% No load values
-I_noload0 = 0.19;									% A
-w_noload0 = 7200 * RadPSecPerRPM;					% Convert from rmp to rad/s
-
+% Supplied Voltage
+V_ss = 12;
 
 %%%%%%%%%%%%%%%%%%
 % Motor 1		 %
@@ -91,9 +62,9 @@ Diam_m1	 		= 0.03;       							% Motor Diameter (m)
 r_m1 			= Diam_m1 / 2;							% Motor Radius (m)
 Length_m1 		= 0.047;             					% Motor Length (m)
 %% Find weight!!
-Weight_m1		= 0.05;             					% Motor Weight (kg)
+Weight_m1		= 0.3;             						% Motor Weight (kg)
 
-J_rotor1			= Sml;
+J_rotor1		= Sml;
 
 % Armature Resistance and Inductance
 R_a1 = 1.75;										% Ohms
