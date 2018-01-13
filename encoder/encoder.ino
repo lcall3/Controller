@@ -2,25 +2,22 @@
  *  
  */
 
-const byte PULSES_PER_REV = 24;
-
-const byte ledPin = 13;
 const byte interruptPin = 2;
 volatile byte state = LOW;
 volatile uint16_t pulses = 0;
 volatile bool changed = false;
 
 void setup() {
-    pinMode(ledPin, OUTPUT);
-    pinMode(interruptPin, INPUT_PULLUP);
+    pinMode(13, OUTPUT);
+    pinMode(interruptPin, INPUT);
     attachInterrupt(digitalPinToInterrupt(interruptPin), blink, CHANGE);
-    Serial.begin(9600);
+    Serial.begin(115200);
 }
 
 void loop() {
-    digitalWrite(ledPin, state);
+    digitalWrite(13, state);
     if (changed) {
-        Serial.println(pulses * 360.0 / (24.0 * 2));
+        Serial.println(pulses);
         changed = false;
     }
 }

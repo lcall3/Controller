@@ -29,15 +29,12 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(encoderA_pin), encoderA_ISR, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoderB_pin), encoderB_ISR, CHANGE);
     Serial.begin(115200);
-    Serial.println("RESET");
 }
 
 void loop() {
     if (changed) {
-        Serial.println(encoderPos, DEC);
+        Serial.println(encoderPos);
         changed = false;
     }
-    delay(200);
-    //Serial.println(encoderPos, DEC);
 }
 
