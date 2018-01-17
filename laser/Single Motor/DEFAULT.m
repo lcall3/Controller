@@ -10,5 +10,4 @@
 % CONTROLLER GAINS
 % ================
 % PID Controller
-PID0 = [1 0 0];
-PID1 = [0.1 0 0];
+PID1 = [0.01 0 0];
