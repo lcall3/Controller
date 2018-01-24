@@ -1,6 +1,3 @@
-% This script contains all physical constants and specifications for the
-% SLS 3-D Printer
-
 % Start with a clean slate
 % Erase entire Matlab environment
 clear all;
@@ -64,7 +61,6 @@ Length_m1 		= 0.047;             					% Motor Length (m)
 %% Find weight!!
 Weight_m1		= 0.3;             						% Motor Weight (kg)
 
-J_rotor1		= Sml;
 
 % Armature Resistance and Inductance
 R_a1 = 1.75;										% Ohms
