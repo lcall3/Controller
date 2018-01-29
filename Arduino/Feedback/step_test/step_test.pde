@@ -63,9 +63,10 @@ void drawExpected() {
     text("Expected response (" + str(DESTINATION) + ")", 54, center_height - norm_height - 4);
 }
 
+int dataPoints;
 void drawSerialResponse() {
     // Draw the line
-    int dataPoints = receivedValues.size();
+    dataPoints = receivedValues.size();
     if (dataPoints == 0) return;
 
     float delta_x = norm_width / dataPoints;
@@ -77,25 +78,38 @@ void drawSerialResponse() {
         float y = map(angle, 0, DESTINATION, center_height, center_height - norm_height);
         float prev_y = map(receivedValues.get(i - 1) * 360.0 / PULSE_PER_REV, 0, DESTINATION, center_height, center_height - norm_height);
         line(50 + (i - 1) * delta_x, prev_y, 50 + i * delta_x, y);
+
+        if (i == dataPoints - 1) {
+            fill(0, 255, 0);
+            text(str(angle) + " deg", width - 50, y - 20);
+        }
     }
     strokeWeight(1);
 }
 
 final int LF = 10;
 void serialEvent(Serial p) {
-    if (p != null & p.available() > 0) {
+    if (p != null && p.available() > 0) {
         String readString = p.readStringUntil(LF);
 
         if (readString == null) {
             return;
         } else if (readString.equals("###")) {
             receivedValues.clear();
+            dataPoints = 0;
         } else {
-            receivedValue = Integer.parseInt(readString.trim());
-            if (receivedValues.size() > 3000) {
+            try {
+                receivedValue = Integer.parseInt(readString.trim());
+                if (receivedValues.size() > 3000) {
+                    receivedValues.clear();
+                    dataPoints = 0;
+                }
+                receivedValues.append(receivedValue);
+            } catch (Throwable t) {
+                println("Unexpected input");
                 receivedValues.clear();
+                dataPoints = 0;
             }
-            receivedValues.append(receivedValue);
         }
     }
 }

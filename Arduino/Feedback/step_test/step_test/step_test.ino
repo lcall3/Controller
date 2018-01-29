@@ -47,7 +47,7 @@ void setup() {
     pinMode(motor0_en, OUTPUT);
 
     // Create an array to store the step response
-    Serial.println("###");
+    Serial.println("\n###");
     
 }
 
