@@ -13,6 +13,9 @@ uint8_t encoder0_B_in = 0;
 
 bool changed = false;
 
+const int MAX_TIME = 3000;   // (ms)
+const int SAMPLE_TIME = 1;   // (ms)
+
 void encoder0_A_ISR() {
     encoder0_A_in ^ encoder0_B_in ? encoder0_pos++ : encoder0_pos--;
     encoder0_A_in = digitalRead(encoder0_A_pin);
@@ -31,22 +34,17 @@ void setup() {
     attachPCINT(digitalPinToPCINT(encoder0_A_pin), encoder0_A_ISR, CHANGE);
     attachPCINT(digitalPinToPCINT(encoder0_B_pin), encoder0_B_ISR, CHANGE);
     Serial.begin(9600);
-    Serial.println("PCINT Rotary Encoder Test");
+
+    // Create an array to store the step response
+    
 }
 
-int time;
-bool done = false;
+int count_time = 0;
+bool checked = false;
 void loop() {
-    if (changed) {
+    if (count_time != millis() && millis() <= MAX_TIME) {
         Serial.println(encoder0_pos);
-        changed = false;
-    }
-
-    if (millis() <= 1) {
-        time++;
-    } else if (done == false) {
-        Serial.println(time);
-        done = true;
+        count_time = millis();
     }
 }
 

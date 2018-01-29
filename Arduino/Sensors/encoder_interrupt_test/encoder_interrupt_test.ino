@@ -1,5 +1,5 @@
-/*
- * Feedback implementation using pin change interrupts
+/* Using pin change interrupts
+ *
  */
 
 #include "PinChangeInterrupt.h"
@@ -34,19 +34,9 @@ void setup() {
     Serial.println("PCINT Rotary Encoder Test");
 }
 
-int time;
-bool done = false;
 void loop() {
     if (changed) {
         Serial.println(encoder0_pos);
         changed = false;
     }
-
-    if (millis() <= 1) {
-        time++;
-    } else if (done == false) {
-        Serial.println(time);
-        done = true;
-    }
 }
-
