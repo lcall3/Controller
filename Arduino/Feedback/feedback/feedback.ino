@@ -40,11 +40,6 @@ void setup() {
 void loop() {
     analogWrite(motor_enable_pin, 47);
     if (changed) {
-        // if (encoder_pos % 96 == 0) {
-        //     analogWrite(motor_enable_pin, 0);
-        //     delay(1000);
-        // }
-        // analogWrite(motor_enable_pin, 150);
         Serial.println(encoder_pos, DEC);
         changed = false;
     }
