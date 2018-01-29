@@ -9,14 +9,22 @@ float center_height;
 float norm_width;
 
 final int PULSE_PER_REV = 96;
-final float DESTINATION = 30;
+final float DESTINATION = 360;
+
+final int BAUD_RATE = 9600;
 
 void setup() {
     size(800, 600);
-    try {
-        String portName = Serial.list()[0];
-        arduino = new Serial(this, portName, 9600);
-    } catch (Throwable t) {
+
+    String[] portList = Serial.list();
+    for (int i = 0; i < portList.length; i++) {
+        try {
+            String portName = Serial.list()[i];
+            arduino = new Serial(this, portName, BAUD_RATE);
+            break;
+        } catch (Throwable t) {
+            println(Serial.list()[i] + " is not available for Serial communication");
+        }
     }
 
     frameRate(60);
@@ -30,8 +38,13 @@ void setup() {
 void draw() {
     background(0);
     drawUI();
-    drawExpected();
-    drawSerialResponse();
+
+    if (arduino != null) {
+        drawExpected();
+        drawSerialResponse();
+    } else {
+        drawNA();
+    }
 }
 
 void drawUI() {
@@ -47,18 +60,10 @@ void drawExpected() {
     stroke(255, 255, 0);
     line(50, center_height - norm_height, width, center_height - norm_height);
     fill(255, 255, 0);
-    text("Expected response", 54, center_height - norm_height - 4);
-    text(str(DESTINATION), 0, center_height - norm_height - 4);
+    text("Expected response (" + str(DESTINATION) + ")", 54, center_height - norm_height - 4);
 }
 
 void drawSerialResponse() {
-    if (arduino != null & arduino.available() > 0) {
-        String readString = arduino.readStringUntil(10);
-        if (readString == null) return;
-        receivedValue = Integer.parseInt(readString.trim());
-        receivedValues.append(receivedValue);
-    }
-    
     // Draw the line
     int dataPoints = receivedValues.size();
     if (dataPoints == 0) return;
@@ -74,4 +79,29 @@ void drawSerialResponse() {
         line(50 + (i - 1) * delta_x, prev_y, 50 + i * delta_x, y);
     }
     strokeWeight(1);
+}
+
+final int LF = 10;
+void serialEvent(Serial p) {
+    if (p != null & p.available() > 0) {
+        String readString = p.readStringUntil(LF);
+
+        if (readString == null) {
+            return;
+        } else if (readString.equals("###")) {
+            receivedValues.clear();
+        } else {
+            receivedValue = Integer.parseInt(readString.trim());
+            if (receivedValues.size() > 3000) {
+                receivedValues.clear();
+            }
+            receivedValues.append(receivedValue);
+        }
+    }
+}
+
+void drawNA() {
+    stroke(255, 0, 0);
+    line(0, 0, width, height);
+    line(0, height, width, 0);
 }
