@@ -6,6 +6,7 @@
 
 // Test mode
 #define TEST_TOGGLE_MODE
+#define SAMPLE_TIME = 1;   // (ms)
 
 // Pin definitions
 #define encoder0_A_pin 5
@@ -14,13 +15,11 @@
 #define motor0_direc2 8
 #define motor0_en 9
 
+// Interrupt variables
 volatile int encoder0_pos = 0;
-uint8_t encoder0_A_in = 0;
-uint8_t encoder0_B_in = 0;
-
-bool changed = false;
-
-const int SAMPLE_TIME = 1;   // (ms)
+volatile bool encoder0_A_in = 0;
+volatile bool encoder0_B_in = 0;
+volatile bool changed = false;
 
 // Encoder ISRs
 void encoder0_A_ISR() {
@@ -93,6 +92,5 @@ void loop() {
         analogWrite(motor0_en, motor0_en_value);
     }
     #endif
-
 }
 
