@@ -55,8 +55,8 @@ int count_time = 0;
 int target_pos = 0;
 int motor0_en_value;
 int motor0_en_value_adj;
-const float motor0_K_p = 0.14;
-const float motor0_K_i = 0.0003;
+const float motor0_K_p = 0.07;
+const float motor0_K_i = 0.00003;
 int accum_error = 0;
 
 #ifdef TEST_TOGGLE_MODE
