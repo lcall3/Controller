@@ -16,7 +16,7 @@
 #define motor0_en 9
 
 // Interrupt variables
-volatile int encoder0_pos = 0;
+volatile long encoder0_pos = 0;
 volatile bool encoder0_A_in = 0;
 volatile bool encoder0_B_in = 0;
 volatile bool changed = false;
@@ -54,21 +54,26 @@ void setup() {
 int count_time = 0;
 int target_pos = 0;
 int motor0_en_value;
-float motor0_K_p = 0.3;
+int motor0_en_value_adj;
+float motor0_K_p = 0.15;
 
 #ifdef TEST_TOGGLE_MODE
-int test_toggle_time = 1000;
+int test_toggle_time = 500;
 #endif
 
 void loop() {
     if (count_time != millis()) {
-        Serial.println(encoder0_pos);
+        Serial.print(encoder0_pos);
+        Serial.print(" ");
+        Serial.print(target_pos);
+        Serial.print(" ");
+        Serial.println(motor0_en_value);
         count_time = millis();
 
         // Control code (to be executed per millisecond)
         #ifdef TEST_TOGGLE_MODE
         // Toggles position every second
-        if (millis() % test_toggle_time) {
+        if (millis() % test_toggle_time == 0) {
             if (target_pos == 0) {
                 target_pos = 400;
             } else {
@@ -80,7 +85,8 @@ void loop() {
 
     // Controller code that runs as fast as possible
     #ifdef TEST_TOGGLE_MODE
-    motor0_en_value = (target_pos - encoder0_pos) * motor0_K_p;
+    motor0_en_value = constrain((target_pos - encoder0_pos) * motor0_K_p, -50, 50) + 10;
+
     if (motor0_en_value < 0) {
         // Flip direction first
         digitalWrite(motor0_direc1, LOW);
