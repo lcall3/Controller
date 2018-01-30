@@ -55,47 +55,49 @@ int count_time = 0;
 int target_pos = 0;
 int motor0_en_value;
 int motor0_en_value_adj;
-float motor0_K_p = 0.15;
+const float motor0_K_p = 0.14;
 
 #ifdef TEST_TOGGLE_MODE
-int test_toggle_time = 500;
+int test_toggle_time = 600;
+const int motor0_K_p_offset = 12;
+int track_time = 0;
 #endif
 
 void loop() {
     if (count_time != millis()) {
-        Serial.print(encoder0_pos);
-        Serial.print(" ");
-        Serial.print(target_pos);
-        Serial.print(" ");
-        Serial.println(motor0_en_value);
-        count_time = millis();
+        Serial.println(encoder0_pos);
 
         // Control code (to be executed per millisecond)
         #ifdef TEST_TOGGLE_MODE
         // Toggles position every second
-        if (millis() % test_toggle_time == 0) {
+        if (track_time > test_toggle_time) {
             if (target_pos == 0) {
                 target_pos = 400;
             } else {
                 target_pos = 0;
             }
+            track_time = 0;
+        } else {
+            track_time++;
         }
         #endif
+
+        count_time = millis();
     }
 
     // Controller code that runs as fast as possible
     #ifdef TEST_TOGGLE_MODE
-    motor0_en_value = constrain((target_pos - encoder0_pos) * motor0_K_p, -50, 50) + 10;
+    motor0_en_value = constrain((target_pos - encoder0_pos) * motor0_K_p, -50, 50);
 
     if (motor0_en_value < 0) {
         // Flip direction first
         digitalWrite(motor0_direc1, LOW);
         digitalWrite(motor0_direc2, HIGH);
-        analogWrite(motor0_en, -motor0_en_value);
+        analogWrite(motor0_en, (-motor0_en_value) + motor0_K_p_offset);
     } else {
         digitalWrite(motor0_direc1, HIGH);
         digitalWrite(motor0_direc2, LOW);
-        analogWrite(motor0_en, motor0_en_value);
+        analogWrite(motor0_en, motor0_en_value + motor0_K_p_offset);
     }
     #endif
 }
