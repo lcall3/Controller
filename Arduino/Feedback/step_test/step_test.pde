@@ -4,11 +4,13 @@ Serial arduino;
 int receivedValue;
 IntList receivedValues;
 
+boolean overflowAngle = true;
+
 float norm_height = 200;
 float center_height;
 float norm_width;
 
-final int PULSE_PER_REV = 96;
+final int PULSE_PER_REV = 400;
 final float DESTINATION = 360;
 
 final int BAUD_RATE = 9600;
@@ -75,6 +77,7 @@ void drawSerialResponse() {
     for (int i = 1; i < dataPoints; i++) {
         int sensor = receivedValues.get(i);
         float angle = sensor * 360.0 / PULSE_PER_REV;
+        
         float y = map(angle, 0, DESTINATION, center_height, center_height - norm_height);
         float prev_y = map(receivedValues.get(i - 1) * 360.0 / PULSE_PER_REV, 0, DESTINATION, center_height, center_height - norm_height);
         line(50 + (i - 1) * delta_x, prev_y, 50 + i * delta_x, y);
