@@ -55,13 +55,15 @@ int count_time = 0;
 int target_pos = 0;
 int motor0_en_value;
 int motor0_en_value_adj;
-const float motor0_K_p = 0.07;
-const float motor0_K_i = 0.00003;
+// const float motor0_K_p = 0.068;
+// const float motor0_K_i = 0.000028;
+const float motor0_K_p = 0.075;
+const float motor0_K_i = 0.00001;
 int accum_error = 0;
 
 #ifdef TEST_TOGGLE_MODE
 int test_toggle_time = 600;
-const int motor0_en_offset = 11;
+const int motor0_en_offset = 13;
 int track_time = 0;
 #endif
 
@@ -83,7 +85,7 @@ void loop() {
                 target_pos = 0;
             }
             track_time = 0;
-            accum_error = 0;
+            // accum_error = 0;
         } else {
             track_time++;
         }
