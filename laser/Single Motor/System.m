@@ -1,12 +1,6 @@
 CONSTANTS;
 
-	
-% Kinetic Friction
-% Kinetic friction = torque / speed 
-KineticFriction = KTorque * NoLoadCurrent / NoLoadSpeed;			
-% No load condition implies input torque = torque lost to friction												
-
-
+				
 % Current Driver (H-Bridge)
 Amp1n   = [Vss];               					% Numerator
 Amp1d   = [1];               					% Denominator
@@ -59,13 +53,15 @@ ol_q1 = zpk(minreal(oltf_q1));
 
 ol_pid = zpk(ol_q1 * tf([1 284.8 0],[1 0]));
 
-tf_control = zpk(minreal(ol_q1 * tf([0.00961 2.739 0], [1 0])));
+tf_control = zpk(minreal(ol_q1 * tf([1 1 0], [1 0])));
 
 
 % ==========================================
 % Control
 % ==========================================
 
-PID1 = [1 0 0]; 
+% Initial Value
+PID1 = [1 0 2.6]; 
 
-
+PID1 = [3 0.01 2]; 
+PID1 = [210 0 5.5]; 
