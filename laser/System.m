@@ -1,58 +1,51 @@
 % This script sets the model parameters for the SLS 3-D Printer
 CONSTANTS;
-DEFAULT;
-         
-
 
 
 % ==========================
 % Inertia Calculations
 % ==========================
 
-rho_motor = Weight_m0 / (pi * r_m0^2 * Length_m0);
-Weight_1 = rho_motor * pi * r_m0^2 * Width_laser;
-Weight_2 = Weight_m0 + Weight_1;
+RhoMotor = MotorWeight / (pi * (MotorRadius)^2 * MotorLength);
+Weight1 = RhoMotor * pi * (MotorRadius)^2 * MotorOffset;
+Weight2 = MotorWeight + Weight1 + CasingWeight;
 
-J_motor = (1 / 12) * Weight_2 * (3 * r_m0^2 + (Length_m0 + Width_laser)^2) - (1 / 12) * Weight_1 * (3 * r_m0^2 + Width_laser^2);
+JMotor = (1 / 12) * Weight2 * (3 * (MotorRadius)^2 + (MotorLength + MotorOffset)^2) - (1 / 12) * Weight1 * (3 * (MotorRadius)^2 + MotorOffset^2);
+JRod = (1 / 2) * RodWeight * (RodRadius^2 + RodInnerRadius^2);
 
-J_system = J_motor + J_rotor0;
+JSystem = JRotor + JMotor + JRod;
 
-% Static Friction
-F_sf = 0;
 
-% Kinetic Friction
-F_kf = K_T0 * I_noload0 / w_noload0;					% Kinetic friction = torque / speed 
-															% No load condition implies input torque = torque lost to friction
 % =============================
 % Q0 : Rotation about y-axis
 % =============================
 
-% Amplifier Dynamics
-Amp0n   = [1];                      	% Numerator
-Amp0d   = [1];               			% Denominator
-AmpSat0 = V_nom0;						% Amplifier saturates at nominal voltage of motor
+% Current Driver (H-Bridge)
+Amp0n   = [Vss];               					% Numerator
+Amp0d   = [1];               					% Denominator
+AmpSat0 = NomVoltage;
 
 % Electrical Motor Dynamics
-Elec0n  = [1];               						% Numerator
-Elec0d  = [L_a0 R_a0];              	 			% Denominator
+Elec0n = [1];                					% Numerator
+Elec0d = [La Ra];                				% Denominator
 
 % Torque Const & Back EMF
-TConst0  = K_T0;
-BackEMF0 = 1/K_B0;
+TConst0  = KTorque;
+BackEMF0 = 1/KEmf;
 
 % Mechanical Motor Dynamics
-Mech0n  = [1 0];               					% Numerator
-Mech0d  = [J_system F_kf 0];					% Denominator
-JntSat0 = pi;									% Maximum angle is +/- 180 degrees
+Mech0n = [1 0];                					% Numerator
+Mech0d = [JSystem KineticFriction 0];            % Denominator 
+JntSat0 =  JntLim * RadPerDeg;
 
 % Sensor Dynamics
-Sens0    =  SensV / (SensAng * RadPerDeg);		% Sensor converts angle to voltage
-SensSat0 =  SensV;								% Maximum sensor voltage
+Sens0    =  SensV / (SensAng * RadPerDeg);
+SensSat0 =  SensV;
 
 % Static Friction
-StFric0 = F_sf;
+StFric0 = 0;									% Mass of rotor is negligible
 
-K_FB0 = 1;
+KFeedback = 1;
 
 
 	
@@ -70,32 +63,32 @@ F_kf = K_T1 * I_noload1 / w_noload1;			% Kinetic friction = torque / speed
 % Q1 : Rotation about x-axis
 % =============================
 
-% Amplifier Dynamics
-Amp1n   = Amp0n;               					% Numerator
-Amp1d   = Amp0d;               					% Denominator
-AmpSat1 = V_nom0;
+% Current Driver (H-Bridge)
+Amp1n   = [Vss];               					% Numerator
+Amp1d   = [1];               					% Denominator
+AmpSat1 = NomVoltage;
 
 % Electrical Motor Dynamics
 Elec1n = [1];                					% Numerator
-Elec1d = [L_a1 R_a1];                			% Denominator
+Elec1d = [La Ra];                				% Denominator
 
 % Torque Const & Back EMF
-TConst1  = K_T1;
-BackEMF1 = 1/K_B1;
+TConst1  = KTorque;
+BackEMF1 = 1/KEmf;
 
 % Mechanical Motor Dynamics
 Mech1n = [1 0];                					% Numerator
-Mech1d = [J_rotor1 F_kf 0];                		% Denominator (No spring)
+Mech1d = [JRotor KineticFriction 0];            % Denominator 
 JntSat1 =  JntLim * RadPerDeg;
 
 % Sensor Dynamics
-Sens1    =  SensV / (SensAng * RadPerDeg);		% Same as motor 0
+Sens1    =  SensV / (SensAng * RadPerDeg);
 SensSat1 =  SensV;
 
 % Static Friction
 StFric1 = 0;									% Mass of rotor is negligible
 
-K_FB1 = 1;
+KFeedback = 1;
 
 
 % ==========================================

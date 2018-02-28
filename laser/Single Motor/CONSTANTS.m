@@ -29,7 +29,18 @@ Distance   	= 1;          	% Distance from laser to screen      	(m)
 JointX		= 1;			% Horizontal displacement from Motor 0 	(m)
 JointY 		= 1;			% Vertical displacement from Motor 0	(m)
 
+% Laser
 LaserWidth = 0.01;			% Diameter of laser 					(m)
+MotorOffset = 0.02;
+
+% Center axle parameters
+RodLength = 0;
+RodRadius = 0;
+RodInnerRadius = 0;
+RodWeight = 0;
+
+% Weight of 3D printed motor casing
+CasingWeight = 0;
 
 % Material & Spring Constant
 RhoJoint   	= 1;           	% Density of Joint Material
@@ -73,3 +84,9 @@ NoLoadCurrent = 0.19;									% A
 NoLoadSpeed = 7200 * RadPSecPerRPM;						% Convert from rmp to rad/s
 
 JRotor	= 4.646e-5;
+
+	
+% Kinetic Friction
+% Kinetic friction = torque / speed 
+KineticFriction = KTorque * NoLoadCurrent / NoLoadSpeed;			
+% No load condition implies input torque = torque lost to friction	
