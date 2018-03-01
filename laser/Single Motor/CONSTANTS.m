@@ -65,8 +65,7 @@ NomVoltage 			= 12;
 MotorDiam	 		= 0.03;       						% Motor Diameter (m)
 MotorRadius 		= MotorDiam / 2;					% Motor Radius (m)
 MotorLength 		= 0.047;             				% Motor Length (m)
-%% Find weight!!
-MotorWeight			= 0.3;             					% Motor Weight (kg)
+MotorWeight			= 0.114;             					% Motor Weight (kg)
 
 
 % Armature Resistance and Inductance
@@ -77,13 +76,13 @@ La = 1.12e-3;											% H
 KTorque = 	23.54/1000;									% Convert from mNm/A to (Nm/A)
 
 % Back EMF Constant
-KEmf = 628.5*RadPSecPerRPM;								% Convert rmp/V to ((rad/s)/V)
+KEmf = 609.18*RadPSecPerRPM;								% Convert rmp/V to ((rad/s)/V)
 
 % No load values
 NoLoadCurrent = 0.19;									% A
 NoLoadSpeed = 7200 * RadPSecPerRPM;						% Convert from rmp to rad/s
 
-JRotor	= 4.646e-5;
+JRotor = 5.932e-6;
 
 	
 % Kinetic Friction
