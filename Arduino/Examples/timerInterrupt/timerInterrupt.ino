@@ -31,6 +31,7 @@ inline void init_timer1() {
     TCCR1B |= (1 << WGM12);
 
     // Set 256 prescaler
+    // Prescalers can be 1, 8, 64, 256, 1024
     TCCR1B |= (1 << CS12);
 
     // Enable timer compare interrupt
