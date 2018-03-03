@@ -21,9 +21,11 @@ byte portState;
 
 void setup() {
     // Sets pin 2 (PORTD) as output
+    // This is the same as using the function pinMode(xx, OUTPUT);
     DDRD |= 1 << 2;
 
     // Sets pin 3 (PORTD) as input
+    // This is the same as using the function pinMode(xx, INPUT);
     DDRD &= ~(1 << 3);
 
     // Set pin 2 to HIGH
