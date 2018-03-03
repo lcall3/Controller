@@ -76,14 +76,13 @@ inline void init_timer1() {
 
     // Set output compare value
     // Match value = Clock Freq / Prescaler / Desired Freq
-    // 3125        = 16 MHz     / 256       / 1000 Hz
-    OCR1A = 3125;
+    // 625         = 16 MHz     / 256       / 100 Hz
+    OCR1A = 625;
 
     // CTC (clear timer on compare match) mode
     TCCR1B |= (1 << WGM12);
 
     // Set 256 prescaler
-    // Prescalers can be 1, 8, 64, 256, 1024
     TCCR1B |= (1 << CS12);
 
     // Enable timer compare interrupt
