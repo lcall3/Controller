@@ -9,6 +9,19 @@
 #define Q0_ENCODER_A 5          // PORTD 5
 #define Q0_ENCODER_B 6          // PORTD 6
 
+// Whether or not using current driver or power supply
+#define Q0_USING_CURRENT_DRIVER
+
+#ifdef Q0_USING_CURRENT_DRIVER
+
+// Pins for output to current driver
+#define Q0_EN_PIN 9
+
+// PWN control
+String input_pwm;
+int pwm;
+#endif
+
 // Encoder and interrupt variables
 volatile bool encoderA;
 volatile bool encoderB;
@@ -71,6 +84,10 @@ void setup() {
     speed = 0;
     speed_changed = false;
 
+    #ifdef Q0_USING_CURRENT_DRIVER
+    pwm = 0;
+    #endif
+
     // Turn off all interrupts
     noInterrupts();
 
@@ -79,6 +96,10 @@ void setup() {
     pinMode(encoderB_pin, INPUT);
     attachPCINT(digitalPinToPCINT(encoderA_pin), q0_encoderA_ISR, CHANGE);
     attachPCINT(digitalPinToPCINT(encoderB_pin), q0_encoderB_ISR, CHANGE);
+
+    #ifdef Q0_USING_CURRENT_DRIVER
+    pinMode(Q0_EN_PIN, OUTPUT);
+    #endif
     
     // Initiate timer 1
     init_timer1();
@@ -95,4 +116,20 @@ void loop() {
         Serial.println(speed, DEC);
         speed_changed = 0;
     }
+
+    #ifdef Q0_USING_CURRENT_DRIVER
+    if (Serial.available() > 0) {
+
+        // Read PWM
+        input_pwm = Serial.readString();
+        pwm = input_pwm.toInt();
+
+        // Acknowledge pwm value
+        Serial.print("received: ");
+        Serial.println(pwm, DEC);
+
+        // Write to motor
+        analogWrite(Q0_EN_PIN, pwm);
+    }
+    #endif
 }
