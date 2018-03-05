@@ -150,8 +150,26 @@ void drawTrail() {
 }
 
 void writeShape() {
-    println("#ifdef " + shapeName.toUpperCase() + "_H");
-    println("#define " + shapeName.toUpperCase() + "_H");
-    println("#define N_VERTICES " + str(verts.size()));
-    println("const "
+    output.println("#ifdef " + shapeName.toUpperCase() + "_H");
+    output.println("#define " + shapeName.toUpperCase() + "_H");
+    output.println("#define N_VERTICES " + str(verts.size()));
+    output.println("const " + (useDouble ? "double" : "float") + " vertices_x[N_VERTICES] = {");
+    for (int i = 0, l = verts.size(); i < l; i++) {
+        PVector v = verts.get(i);
+        output.println("    " + str(v.x) + (i == l-1 ? "" : ","));
+    }
+    output.println("};");
+    output.println("const " + (useDouble ? "double" : "float") + " vertices_y[N_VERTICES] = {");
+    for (int i = 0, l = verts.size(); i < l; i++) {
+        PVector v = verts.get(i);
+        output.println("    " + str(v.y) + (i == l-1 ? "" : ","));
+    }
+    output.println("};");
+    output.println("const " + "unsigned short" + " time_vector[N_VERTICES] = {");
+    for (int i = 0, l = vertsTime.size(); i < l; i++) {
+        int time = int(vertsTime.get(i));
+        output.println("    " + str(time) + (i == l-1 ? "" : ","));
+    }
+    output.println("};");
+    output.println("#endif");
 }

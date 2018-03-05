@@ -6,11 +6,11 @@
 void setup() {
     Serial.begin(115200);
     for (int i = 0; i < N_VERTICES; i++) {
-        print(vertices_x[i]);
-        print("\t");
-        print(vertices_y[i]);
-        print("\t");
-        println(time_vector[i]);
+        Serial.print(vertices_x[i]);
+        Serial.print("\t");
+        Serial.print(vertices_y[i]);
+        Serial.print("\t");
+        Serial.println(time_vector[i]);
     }
 }
 
