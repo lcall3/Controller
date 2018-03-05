@@ -98,7 +98,7 @@ void setup() {
     noInterrupts();
 
     // Set encoder mask to 0110 0000 to only read from pin 5 and 6
-    encoder_mask = 1 << (encoderA_pin + 1) | 1 << (encoderB_pin + 1);
+    encoder_mask = 1 << (encoderA_pin) | 1 << (encoderB_pin);
 
     // Set encoder input interrupts
     pinMode(encoderA_pin, INPUT);

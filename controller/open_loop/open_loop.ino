@@ -15,7 +15,7 @@
 #ifdef Q0_USING_CURRENT_DRIVER
 
 // Pins for output to current driver
-#define Q0_EN_PIN 9
+#define Q0_EN_PIN 11
 
 // PWN control
 String input_pwm;
@@ -85,17 +85,17 @@ void setup() {
     speed_changed = false;
 
     #ifdef Q0_USING_CURRENT_DRIVER
-    pwm = 0;
+    pwm = 50;
     #endif
 
     // Turn off all interrupts
-    noInterrupts();
+    // noInterrupts();
 
     // Set encoder input interrupts
-    pinMode(encoderA_pin, INPUT);
-    pinMode(encoderB_pin, INPUT);
-    attachPCINT(digitalPinToPCINT(encoderA_pin), q0_encoderA_ISR, CHANGE);
-    attachPCINT(digitalPinToPCINT(encoderB_pin), q0_encoderB_ISR, CHANGE);
+    pinMode(Q0_ENCODER_A, INPUT);
+    pinMode(Q0_ENCODER_B, INPUT);
+    attachPCINT(digitalPinToPCINT(Q0_ENCODER_A), q0_encoderA_ISR, CHANGE);
+    attachPCINT(digitalPinToPCINT(Q0_ENCODER_B), q0_encoderB_ISR, CHANGE);
 
     #ifdef Q0_USING_CURRENT_DRIVER
     pinMode(Q0_EN_PIN, OUTPUT);
