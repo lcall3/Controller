@@ -34,13 +34,10 @@ volatile uint16_t serial_count;
 // External (pin change) interrupt service routines
 void q0_encoderA_ISR() {
     q0_encoderA ^ q0_encoderB ? q0_encoder_pos_change++ : q0_encoder_pos_change--;
-
-    // Read encoder A
     q0_encoderA = PIND & (1 << Q0_ENCODER_A);
 }
 
 void q0_encoderB_ISR() {
-    // Read encoder B
     q0_encoderB  = PIND & (1 << Q0_ENCODER_B);
     q0_encoderA ^ q0_encoderB ? q0_encoder_pos_change++ : q0_encoder_pos_change--;
 }
@@ -125,7 +122,7 @@ void loop() {
     q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
     analogWrite(Q0_EN_PIN, q0_pwm);
 
-    if (serial_count == 10) {
+    if (serial_count == 25) {
         serial_count = 0;
         Serial.println(q0_position, DEC);
     }
