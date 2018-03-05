@@ -83,15 +83,17 @@ KEmf = 609.18*RadPSecPerRPM;								% Convert rmp/V to ((rad/s)/V)
 
 
 % No load values
-NoLoadCurrent = 0.137;									% A
-NoLoadSpeed = 7000 * RadPSecPerRPM;						% Convert from rmp to rad/s
+NoLoadCurrent = 0.135;									% A
+NoLoadSpeed = 6114 * RadPSecPerRPM;						% Convert from rmp to rad/s
 
 JRotor = 5.932e-6;
+
+PWMConversion = [-1.3118e-8 8.6063e-6 -2.0381e-3 0.2134 -0.33242];
 
 % Test
 % JRotor = 3.5e-6;
 % Ra = 10.5;
-% KEmf = 645 * RadPSecPerRPM;
+KEmf = 630 * RadPSecPerRPM;
 
 	
 % Kinetic Friction

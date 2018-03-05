@@ -2,7 +2,7 @@ CONSTANTS;
 
 				
 % Current Driver (H-Bridge)
-Amp1n   = [Vss];               					% Numerator
+Amp1n   = [Vss];               					% Numerator 
 Amp1d   = [1];               					% Denominator
 AmpSat1 = NomVoltage;
 
@@ -51,9 +51,9 @@ oltf_q1 = tf_amp1 * (g_q1 / (1 + g_q1 * h_q1)) / tf('s');
 % Simplified 
 ol_q1 = zpk(minreal(oltf_q1));
 
-ol_pid = zpk(ol_q1 * tf([1 284.8 0],[1 0]));
+ol_pid = zpk(ol_q1 * tf([1 8.005 0],[1 0]));
 
-tf_control = zpk(minreal(ol_q1 * tf([1 1 0], [1 0])));
+tf_control = zpk(minreal(ol_q1 * tf([1 8.005 0], [1 0])));
 
 
 % ==========================================
@@ -63,5 +63,5 @@ tf_control = zpk(minreal(ol_q1 * tf([1 1 0], [1 0])));
 % Initial Value
 PID1 = [1 0 2.6]; 
 
-PID1 = [3 0.01 2]; 
-PID1 = [210 0 5.5]; 
+% PID1 = [3 0.01 2]; 
+% PID1 = [210 0 5.5]; 
