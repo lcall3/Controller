@@ -34,6 +34,7 @@ void draw() {
     drawCursor();
     drawVertList();
     drawTrail();
+    drawInstructions();
 }
 
 void drawCanvas() {
@@ -172,4 +173,16 @@ void writeShape() {
     }
     output.println("};");
     output.println("#endif");
+}
+
+void drawInstructions() {
+    textSize(20);
+    text("ShapeMaker", 100, top);
+    textSize(12);
+    text("Click anywhere in the canvas to", 100, top + 14);
+    text("add vertices.", 100, top + 28);
+
+    text("The vertices are in sequential order.", 100, top + 56);
+    text("Press BACKSPACE to delete last vertex.", 100, top + 84);
+    text("Press SHIFT+S to save to file", 100, top + 112);
 }
