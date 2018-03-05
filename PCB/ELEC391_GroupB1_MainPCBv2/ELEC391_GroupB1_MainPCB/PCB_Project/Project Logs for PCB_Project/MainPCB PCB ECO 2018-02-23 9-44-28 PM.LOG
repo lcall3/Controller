@@ -1,0 +1,188 @@
+Added Component: Designator=C1(Cap2.54mm_LGE1.0)
+Added Component: Designator=C2(Cap2.54mm_LGE1.0)
+Added Component: Designator=D1(DO-41_XLGE1.2)
+Added Component: Designator=D2(DO-41_XLGE1.2)
+Added Component: Designator=D3(DO-41_XLGE1.2)
+Added Component: Designator=D4(DO-41_XLGE1.2)
+Added Component: Designator=D5(DO-41_XLGE1.2)
+Added Component: Designator=D6(DO-41_XLGE1.2)
+Added Component: Designator=D7(DO-41_XLGE1.2)
+Added Component: Designator=D8(DO-41_XLGE1.2)
+Added Component: Designator=DriverInput(TERM-BLOCK-5.08MM-3POS)
+Added Component: Designator=EncoderInput(HDR2X4_LGE1.0)
+Added Component: Designator=Motor1In(HDR1X4_LGE1.0)
+Added Component: Designator=Motor1Out(TERM-BLOCK-5.08MM-2POS)
+Added Component: Designator=Motor2In(HDR1X4_LGE1.0)
+Added Component: Designator=Motor2Out(TERM-BLOCK-5.08MM-2POS)
+Added Component: Designator=MotorDriver(Multiwatt15_V_ELEC391mod)
+Added Component: Designator=NanoIn1(HDR1X15)
+Added Component: Designator=NanoIn2(HDR1X15)
+Added Component: Designator=NanoOut1(HDR1X15)
+Added Component: Designator=NanoOut2(HDR1X15)
+Added Component: Designator=Power(HDR2X4_LGE1.0)
+Added Pin To Net: NetName=VS Pin=C1-1
+Added Pin To Net: NetName=GND Pin=C1-2
+Added Pin To Net: NetName=GND Pin=C2-1
+Added Pin To Net: NetName=VSS Pin=C2-2
+Added Pin To Net: NetName=V1- Pin=D1-1
+Added Pin To Net: NetName=VS Pin=D1-2
+Added Pin To Net: NetName=GND Pin=D2-1
+Added Pin To Net: NetName=V1- Pin=D2-2
+Added Pin To Net: NetName=V1+ Pin=D3-1
+Added Pin To Net: NetName=VS Pin=D3-2
+Added Pin To Net: NetName=GND Pin=D4-1
+Added Pin To Net: NetName=V1+ Pin=D4-2
+Added Pin To Net: NetName=V2- Pin=D5-1
+Added Pin To Net: NetName=VCC Pin=D5-2
+Added Pin To Net: NetName=V2+ Pin=D6-1
+Added Pin To Net: NetName=VCC Pin=D6-2
+Added Pin To Net: NetName=GND Pin=D7-1
+Added Pin To Net: NetName=V2- Pin=D7-2
+Added Pin To Net: NetName=GND Pin=D8-1
+Added Pin To Net: NetName=V2+ Pin=D8-2
+Added Pin To Net: NetName=GND Pin=DriverInput-1
+Added Pin To Net: NetName=VS Pin=DriverInput-2
+Added Pin To Net: NetName=VSS Pin=DriverInput-3
+Added Pin To Net: NetName=ENC1A Pin=EncoderInput-1
+Added Pin To Net: NetName=ENC1B Pin=EncoderInput-2
+Added Pin To Net: NetName=ENC2A Pin=EncoderInput-3
+Added Pin To Net: NetName=ENC2B Pin=EncoderInput-4
+Added Pin To Net: NetName=VSS Pin=EncoderInput-5
+Added Pin To Net: NetName=VSS Pin=EncoderInput-6
+Added Pin To Net: NetName=GND Pin=EncoderInput-7
+Added Pin To Net: NetName=GND Pin=EncoderInput-8
+Added Pin To Net: NetName=GND Pin=Motor1In-1
+Added Pin To Net: NetName=ENABLE1 Pin=Motor1In-2
+Added Pin To Net: NetName=DIREC1B Pin=Motor1In-3
+Added Pin To Net: NetName=DIREC1A Pin=Motor1In-4
+Added Pin To Net: NetName=V1- Pin=Motor1Out-1
+Added Pin To Net: NetName=V1+ Pin=Motor1Out-2
+Added Pin To Net: NetName=GND Pin=Motor2In-1
+Added Pin To Net: NetName=ENABLE2 Pin=Motor2In-2
+Added Pin To Net: NetName=DIREC2B Pin=Motor2In-3
+Added Pin To Net: NetName=DIREC2A Pin=Motor2In-4
+Added Pin To Net: NetName=V2- Pin=Motor2Out-1
+Added Pin To Net: NetName=V2+ Pin=Motor2Out-2
+Added Pin To Net: NetName=GND Pin=MotorDriver-1
+Added Pin To Net: NetName=V1- Pin=MotorDriver-2
+Added Pin To Net: NetName=V1+ Pin=MotorDriver-3
+Added Pin To Net: NetName=VS Pin=MotorDriver-4
+Added Pin To Net: NetName=DIREC1A Pin=MotorDriver-5
+Added Pin To Net: NetName=ENABLE1 Pin=MotorDriver-6
+Added Pin To Net: NetName=DIREC1B Pin=MotorDriver-7
+Added Pin To Net: NetName=GND Pin=MotorDriver-8
+Added Pin To Net: NetName=VSS Pin=MotorDriver-9
+Added Pin To Net: NetName=DIREC2B Pin=MotorDriver-10
+Added Pin To Net: NetName=ENABLE2 Pin=MotorDriver-11
+Added Pin To Net: NetName=DIREC2A Pin=MotorDriver-12
+Added Pin To Net: NetName=V2+ Pin=MotorDriver-13
+Added Pin To Net: NetName=V2- Pin=MotorDriver-14
+Added Pin To Net: NetName=GND Pin=MotorDriver-15
+Added Pin To Net: NetName=VSS Pin=NanoIn1-12
+Added Pin To Net: NetName=GND Pin=NanoIn1-14
+Added Pin To Net: NetName=ENABLE1 Pin=NanoIn2-1
+Added Pin To Net: NetName=DIREC1A Pin=NanoIn2-2
+Added Pin To Net: NetName=DIREC1B Pin=NanoIn2-3
+Added Pin To Net: NetName=ENABLE2 Pin=NanoIn2-4
+Added Pin To Net: NetName=DIREC2A Pin=NanoIn2-5
+Added Pin To Net: NetName=DIREC2B Pin=NanoIn2-6
+Added Pin To Net: NetName=ENC1A Pin=NanoIn2-7
+Added Pin To Net: NetName=ENC1B Pin=NanoIn2-8
+Added Pin To Net: NetName=ENC2A Pin=NanoIn2-9
+Added Pin To Net: NetName=ENC2B Pin=NanoIn2-10
+Added Pin To Net: NetName=GND Pin=NanoIn2-12
+Added Pin To Net: NetName=VSS Pin=NanoOut1-12
+Added Pin To Net: NetName=GND Pin=NanoOut1-14
+Added Pin To Net: NetName=ENABLE1 Pin=NanoOut2-1
+Added Pin To Net: NetName=DIREC1A Pin=NanoOut2-2
+Added Pin To Net: NetName=DIREC1B Pin=NanoOut2-3
+Added Pin To Net: NetName=ENABLE2 Pin=NanoOut2-4
+Added Pin To Net: NetName=DIREC2A Pin=NanoOut2-5
+Added Pin To Net: NetName=DIREC2B Pin=NanoOut2-6
+Added Pin To Net: NetName=ENC1A Pin=NanoOut2-7
+Added Pin To Net: NetName=ENC1B Pin=NanoOut2-8
+Added Pin To Net: NetName=ENC2A Pin=NanoOut2-9
+Added Pin To Net: NetName=ENC2B Pin=NanoOut2-10
+Added Pin To Net: NetName=GND Pin=NanoOut2-12
+Added Pin To Net: NetName=VSS Pin=Power-1
+Added Pin To Net: NetName=GND Pin=Power-2
+Added Pin To Net: NetName=VSS Pin=Power-3
+Added Pin To Net: NetName=GND Pin=Power-4
+Added Pin To Net: NetName=VSS Pin=Power-5
+Added Pin To Net: NetName=GND Pin=Power-6
+Added Pin To Net: NetName=VSS Pin=Power-7
+Added Pin To Net: NetName=GND Pin=Power-8
+Added Pin To Net: NetName=NetNanoIn1_1 Pin=NanoIn1-1
+Added Pin To Net: NetName=NetNanoIn1_1 Pin=NanoOut1-1
+Added Net: Name=NetNanoIn1_1
+Added Pin To Net: NetName=NetNanoIn1_2 Pin=NanoIn1-2
+Added Pin To Net: NetName=NetNanoIn1_2 Pin=NanoOut1-2
+Added Net: Name=NetNanoIn1_2
+Added Pin To Net: NetName=NetNanoIn1_3 Pin=NanoIn1-3
+Added Pin To Net: NetName=NetNanoIn1_3 Pin=NanoOut1-3
+Added Net: Name=NetNanoIn1_3
+Added Pin To Net: NetName=NetNanoIn1_4 Pin=NanoIn1-4
+Added Pin To Net: NetName=NetNanoIn1_4 Pin=NanoOut1-4
+Added Net: Name=NetNanoIn1_4
+Added Pin To Net: NetName=NetNanoIn1_5 Pin=NanoIn1-5
+Added Pin To Net: NetName=NetNanoIn1_5 Pin=NanoOut1-5
+Added Net: Name=NetNanoIn1_5
+Added Pin To Net: NetName=NetNanoIn1_6 Pin=NanoIn1-6
+Added Pin To Net: NetName=NetNanoIn1_6 Pin=NanoOut1-6
+Added Net: Name=NetNanoIn1_6
+Added Pin To Net: NetName=NetNanoIn1_7 Pin=NanoIn1-7
+Added Pin To Net: NetName=NetNanoIn1_7 Pin=NanoOut1-7
+Added Net: Name=NetNanoIn1_7
+Added Pin To Net: NetName=NetNanoIn1_8 Pin=NanoIn1-8
+Added Pin To Net: NetName=NetNanoIn1_8 Pin=NanoOut1-8
+Added Net: Name=NetNanoIn1_8
+Added Pin To Net: NetName=NetNanoIn1_9 Pin=NanoIn1-9
+Added Pin To Net: NetName=NetNanoIn1_9 Pin=NanoOut1-9
+Added Net: Name=NetNanoIn1_9
+Added Pin To Net: NetName=NetNanoIn1_10 Pin=NanoIn1-10
+Added Pin To Net: NetName=NetNanoIn1_10 Pin=NanoOut1-10
+Added Net: Name=NetNanoIn1_10
+Added Pin To Net: NetName=NetNanoIn1_11 Pin=NanoIn1-11
+Added Pin To Net: NetName=NetNanoIn1_11 Pin=NanoOut1-11
+Added Net: Name=NetNanoIn1_11
+Added Pin To Net: NetName=NetNanoIn1_13 Pin=NanoIn1-13
+Added Pin To Net: NetName=NetNanoIn1_13 Pin=NanoOut1-13
+Added Net: Name=NetNanoIn1_13
+Added Pin To Net: NetName=NetNanoIn1_15 Pin=NanoIn1-15
+Added Pin To Net: NetName=NetNanoIn1_15 Pin=NanoOut1-15
+Added Net: Name=NetNanoIn1_15
+Added Pin To Net: NetName=NetNanoIn2_11 Pin=NanoIn2-11
+Added Pin To Net: NetName=NetNanoIn2_11 Pin=NanoOut2-11
+Added Net: Name=NetNanoIn2_11
+Added Pin To Net: NetName=NetNanoIn2_13 Pin=NanoIn2-13
+Added Pin To Net: NetName=NetNanoIn2_13 Pin=NanoOut2-13
+Added Net: Name=NetNanoIn2_13
+Added Pin To Net: NetName=NetNanoIn2_14 Pin=NanoIn2-14
+Added Pin To Net: NetName=NetNanoIn2_14 Pin=NanoOut2-14
+Added Net: Name=NetNanoIn2_14
+Added Pin To Net: NetName=NetNanoIn2_15 Pin=NanoIn2-15
+Added Pin To Net: NetName=NetNanoIn2_15 Pin=NanoOut2-15
+Added Net: Name=NetNanoIn2_15
+Added Member To Class: ClassName=PCB Member=Component C1 G-Cap
+Added Member To Class: ClassName=PCB Member=Component C2 G-Cap
+Added Member To Class: ClassName=PCB Member=Component D1 1N4148
+Added Member To Class: ClassName=PCB Member=Component D2 1N4148
+Added Member To Class: ClassName=PCB Member=Component D3 1N4148
+Added Member To Class: ClassName=PCB Member=Component D4 1N4148
+Added Member To Class: ClassName=PCB Member=Component D5 1N4148
+Added Member To Class: ClassName=PCB Member=Component D6 1N4148
+Added Member To Class: ClassName=PCB Member=Component D7 1N4148
+Added Member To Class: ClassName=PCB Member=Component D8 1N4148
+Added Member To Class: ClassName=PCB Member=Component DriverInput Term-Block 3
+Added Member To Class: ClassName=PCB Member=Component EncoderInput C-Hdr2x4
+Added Member To Class: ClassName=PCB Member=Component Motor1In C-Hdr1x4
+Added Member To Class: ClassName=PCB Member=Component Motor1Out Term-Block 2
+Added Member To Class: ClassName=PCB Member=Component Motor2In C-Hdr1x4
+Added Member To Class: ClassName=PCB Member=Component Motor2Out Term-Block 2
+Added Member To Class: ClassName=PCB Member=Component MotorDriver Q-LN298
+Added Member To Class: ClassName=PCB Member=Component NanoIn1 Header 15
+Added Member To Class: ClassName=PCB Member=Component NanoIn2 Header 15
+Added Member To Class: ClassName=PCB Member=Component NanoOut1 Header 15
+Added Member To Class: ClassName=PCB Member=Component NanoOut2 Header 15
+Added Member To Class: ClassName=PCB Member=Component Power C-Hdr2x4
+Added Room: Name=PCB
