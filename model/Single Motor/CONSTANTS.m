@@ -72,17 +72,26 @@ MotorWeight			= 0.114;             					% Motor Weight (kg)
 Ra = 8.4;												% Ohms
 La = 1.12e-3;											% H
 
+
+
 % Torque Constant
 KTorque = 	23.54/1000;									% Convert from mNm/A to (Nm/A)
+
 
 % Back EMF Constant
 KEmf = 609.18*RadPSecPerRPM;								% Convert rmp/V to ((rad/s)/V)
 
+
 % No load values
-NoLoadCurrent = 0.19;									% A
-NoLoadSpeed = 7200 * RadPSecPerRPM;						% Convert from rmp to rad/s
+NoLoadCurrent = 0.137;									% A
+NoLoadSpeed = 7000 * RadPSecPerRPM;						% Convert from rmp to rad/s
 
 JRotor = 5.932e-6;
+
+% Test
+% JRotor = 3.5e-6;
+% Ra = 10.5;
+% KEmf = 645 * RadPSecPerRPM;
 
 	
 % Kinetic Friction

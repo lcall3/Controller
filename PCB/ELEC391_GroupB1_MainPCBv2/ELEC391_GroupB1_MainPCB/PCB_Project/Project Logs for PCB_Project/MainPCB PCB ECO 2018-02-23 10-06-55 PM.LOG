@@ -1,0 +1,3 @@
+Removed Pin From Net: NetName=VSS Pin=DriverInput-2
+Added Pin To Net: NetName=VS Pin=DriverInput-2
+Added Room: Name=PCB

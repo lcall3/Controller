@@ -1,0 +1,11 @@
+Removed Pin From Net: NetName=GND Pin=Motor1In-1
+Removed Pin From Net: NetName=ENABLE1 Pin=Motor1In-2
+Removed Pin From Net: NetName=DIREC1B Pin=Motor1In-3
+Removed Pin From Net: NetName=DIREC1A Pin=Motor1In-4
+Removed Pin From Net: NetName=GND Pin=Motor2In-1
+Removed Pin From Net: NetName=ENABLE2 Pin=Motor2In-2
+Removed Pin From Net: NetName=DIREC2B Pin=Motor2In-3
+Removed Pin From Net: NetName=DIREC2A Pin=Motor2In-4
+Removed Member From Class: ClassName=PCB Member=Motor1In
+Removed Member From Class: ClassName=PCB Member=Motor2In
+Added Room: Name=PCB

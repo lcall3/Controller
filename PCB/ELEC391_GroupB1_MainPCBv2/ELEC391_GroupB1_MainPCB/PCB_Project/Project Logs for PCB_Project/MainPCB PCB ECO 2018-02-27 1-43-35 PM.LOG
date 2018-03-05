@@ -1,0 +1,32 @@
+Removed Pin From Net: NetName=DIREC1B Pin=NanoIn2-1
+Removed Pin From Net: NetName=DIREC1A Pin=NanoIn2-2
+Removed Pin From Net: NetName=ENABLE2 Pin=NanoIn2-4
+Removed Pin From Net: NetName=DIREC2A Pin=NanoIn2-5
+Removed Pin From Net: NetName=ENC1A Pin=NanoIn2-7
+Removed Pin From Net: NetName=ENC2A Pin=NanoIn2-9
+Removed Pin From Net: NetName=DIREC1B Pin=NanoOut2-1
+Removed Pin From Net: NetName=DIREC1A Pin=NanoOut2-2
+Removed Pin From Net: NetName=ENABLE2 Pin=NanoOut2-4
+Removed Pin From Net: NetName=DIREC2A Pin=NanoOut2-5
+Removed Pin From Net: NetName=ENC1A Pin=NanoOut2-7
+Removed Pin From Net: NetName=ENC2A Pin=NanoOut2-9
+Change Component Designator: OldDesignator=12V NewDesignator=DriverInput
+Change Component Designator: OldDesignator=Encoder NewDesignator=EncoderInput
+Change Component Designator: OldDesignator=Motor1 NewDesignator=Motor1Out
+Change Component Designator: OldDesignator=Motor2 NewDesignator=Motor2Out
+Added Pin To Net: NetName=ENABLE2 Pin=NanoIn2-2
+Added Pin To Net: NetName=DIREC1B Pin=NanoIn2-4
+Added Pin To Net: NetName=DIREC1A Pin=NanoIn2-5
+Added Pin To Net: NetName=DIREC2A Pin=NanoIn2-7
+Added Pin To Net: NetName=ENC1A Pin=NanoIn2-9
+Added Pin To Net: NetName=ENC2A Pin=NanoIn2-11
+Added Pin To Net: NetName=ENABLE2 Pin=NanoOut2-2
+Added Pin To Net: NetName=DIREC1B Pin=NanoOut2-4
+Added Pin To Net: NetName=DIREC1A Pin=NanoOut2-5
+Added Pin To Net: NetName=DIREC2A Pin=NanoOut2-7
+Added Pin To Net: NetName=ENC1A Pin=NanoOut2-9
+Added Pin To Net: NetName=ENC2A Pin=NanoOut2-11
+Added Pin To Net: NetName=NetNanoIn2_1 Pin=NanoIn2-1
+Added Pin To Net: NetName=NetNanoIn2_1 Pin=NanoOut2-1
+Added Net: Name=NetNanoIn2_1
+Added Room: Name=PCB

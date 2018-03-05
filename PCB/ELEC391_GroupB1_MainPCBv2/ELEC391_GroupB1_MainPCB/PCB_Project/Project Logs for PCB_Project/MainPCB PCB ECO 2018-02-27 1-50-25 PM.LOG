@@ -1,0 +1,17 @@
+Removed Pin From Net: NetName=DIREC1B Pin=NanoIn2-4
+Removed Pin From Net: NetName=DIREC1A Pin=NanoIn2-5
+Removed Pin From Net: NetName=DIREC2B Pin=NanoIn2-6
+Removed Pin From Net: NetName=DIREC2A Pin=NanoIn2-7
+Removed Pin From Net: NetName=DIREC1B Pin=NanoOut2-4
+Removed Pin From Net: NetName=DIREC1A Pin=NanoOut2-5
+Removed Pin From Net: NetName=DIREC2B Pin=NanoOut2-6
+Removed Pin From Net: NetName=DIREC2A Pin=NanoOut2-7
+Added Pin To Net: NetName=DIREC2B Pin=NanoIn2-4
+Added Pin To Net: NetName=DIREC2A Pin=NanoIn2-5
+Added Pin To Net: NetName=DIREC1B Pin=NanoIn2-6
+Added Pin To Net: NetName=DIREC1A Pin=NanoIn2-7
+Added Pin To Net: NetName=DIREC2B Pin=NanoOut2-4
+Added Pin To Net: NetName=DIREC2A Pin=NanoOut2-5
+Added Pin To Net: NetName=DIREC1B Pin=NanoOut2-6
+Added Pin To Net: NetName=DIREC1A Pin=NanoOut2-7
+Added Room: Name=PCB
