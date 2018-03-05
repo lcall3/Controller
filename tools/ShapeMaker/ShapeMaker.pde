@@ -123,12 +123,12 @@ void drawVertList() {
 
 void drawTrail() {
     strokeWeight(2);
-    stroke(255, 255, 0);
     if (verts.size() > 1) {
         for (int i = 1, l = verts.size(); i < l; i++) {
             PVector current = toScreenCoords(verts.get(i));
             PVector prev = toScreenCoords(verts.get(i - 1));
             
+            stroke(255, 0, 0);
             ellipse(current.x, current.y, 5, 5);
             stroke(
                 map(i, 0, l, 0, 5),
@@ -146,6 +146,7 @@ void drawTrail() {
         
     } else if (verts.size() == 1){
         PVector current = toScreenCoords(verts.get(0));
+        stroke(255, 0, 0);
         ellipse(current.x, current.y, 5, 5);
     }
 }
