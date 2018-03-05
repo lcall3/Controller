@@ -1,4 +1,12 @@
+import garciadelcastillo.dashedlines.*;
+DashedLines dash;
+
 int left, right, top, bottom;
+
+// Output to file
+final String shapeName = "newShape";
+boolean useDouble = false;
+PrintWriter output;
 
 // The rise time for the controller end-to-end in milliseconds
 final float timeFactor = 100.0;
@@ -15,6 +23,9 @@ void setup() {
     right = left + 600;
     top = height/2 - 300;
     bottom = top + 600;
+    
+    dash = new DashedLines(this);
+    dash.pattern(5);
 }
 
 void draw() {
@@ -55,10 +66,6 @@ void mouseClicked() {
     if (mouseInCanvas()) {
         
         // Add point to list
-        //verts.add(new PVector(
-        //    map(mouseX, left, right, -1, 1),
-        //    map(mouseY, top, bottom, 1, -1)
-        //));
         verts.add(toLaserCoords(new PVector(mouseX, mouseY)));
         
         // Calculate the required time based on a time factor and distance
@@ -73,11 +80,34 @@ void mouseClicked() {
     }
 }
 
+void keyPressed() {
+    if (key == BACKSPACE) {
+        // Remove the last entry in the list
+        if (verts.size() > 0) {
+            verts.remove(verts.size() - 1);
+            vertsTime.remove(vertsTime.size() - 1);
+        }
+    } else if (key == 'S') {
+        // Save to file
+        output = createWriter(shapeName + ".h");
+        writeShape();
+        output.flush();
+        output.close();
+    }
+}
+
 PVector toLaserCoords(PVector mouse) {
     PVector laser = mouse.copy();
     laser.x = map(mouse.x, left, right, -1, 1);
     laser.y = map(mouse.y, top, bottom, 1, -1);
     return laser;
+}
+
+PVector toScreenCoords(PVector laser) {
+    PVector screen = laser.copy();
+    screen.x = map(laser.x, -1, 1, left, right);
+    screen.y = map(laser.y, 1, -1, top, bottom);
+    return screen;
 }
 
 void drawVertList() {
@@ -95,24 +125,33 @@ void drawTrail() {
     stroke(255, 255, 0);
     if (verts.size() > 1) {
         for (int i = 1, l = verts.size(); i < l; i++) {
-            PVector current = verts.get(i);
-            PVector prev = verts.get(i - 1);
+            PVector current = toScreenCoords(verts.get(i));
+            PVector prev = toScreenCoords(verts.get(i - 1));
             
             ellipse(current.x, current.y, 5, 5);
             stroke(
-                map(i, 0, l, 0, 255),
-                map(i, 0, l, 255, 0),
-                map(i, 0, l, 0, 255)
+                map(i, 0, l, 0, 5),
+                map(i, 0, l, 242, 117),
+                map(i, 0, l, 96, 230)
             );
-            line(
-                prev.x, 
-                prev.y,
-                current.x,
-                current.y
-            );
+            line(prev.x, prev.y, current.x, current.y);
+            
+            if (i == l-1) {
+                // Draw a line from end to origin to complete the loop
+                PVector first = toScreenCoords(verts.get(0));
+                dash.line(first.x, first.y, current.x, current.y);
+            }
         }
+        
     } else if (verts.size() == 1){
-        PVector current = verts.get(0);
+        PVector current = toScreenCoords(verts.get(0));
         ellipse(current.x, current.y, 5, 5);
     }
+}
+
+void writeShape() {
+    println("#ifdef " + shapeName.toUpperCase() + "_H");
+    println("#define " + shapeName.toUpperCase() + "_H");
+    println("#define N_VERTICES " + str(verts.size()));
+    println("const "
 }
