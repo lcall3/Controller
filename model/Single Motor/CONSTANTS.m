@@ -90,7 +90,7 @@ JRotor = 5.932e-6;
 
 PWMConversion = [-1.3118e-8 8.6063e-6 -2.0381e-3 0.2134 -0.33242];
 
-StaticFric = 0.1;
+StaticFric = 12e-3;
 
 % Test
 % JRotor = 3.5e-6;
