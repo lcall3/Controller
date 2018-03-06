@@ -6,6 +6,8 @@
 // Parameters
 #define PULSE_PER_REV 400       // Pulses per revolution of encoder
 
+// #define LIMIT_PWM
+
 // Pins
 #define Q0_ENCODER_A 5          // PORTD 5
 #define Q0_ENCODER_B 6          // PORTD 6
@@ -111,19 +113,30 @@ void setup() {
 }
 
 int q0_desired_pos = 1000;
+
+#ifdef LIMIT_PWM 
 #define K_MIN 30
 #define K_MAX 80
+#endif
+
 #define P_GAIN 0.05f
 
 void loop() {
     q0_pwm = int(P_GAIN * (q0_desired_pos - q0_position));
     digitalWrite(Q0_DIR_A, q0_pwm > 0);
     digitalWrite(Q0_DIR_B, q0_pwm < 0);
+    q0_pwm = abs(q0_pwm);
+
+    #ifdef LIMIT_PWM
     q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
+    #endif
+
     analogWrite(Q0_EN_PIN, q0_pwm);
 
-    if (serial_count == 25) {
+    if (serial_count == 10) {
         serial_count = 0;
-        Serial.println(q0_position, DEC);
+        Serial.print(q0_position, DEC);
+        Serial.print(" ");
+        Serial.println(q0_pwm, DEC);
     }
 }
