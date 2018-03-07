@@ -36,8 +36,6 @@ KFeedback = 1;
 % Initial Value
 PID1 = [0 1 0]; 
 
-% PID1 = [3 0.01 2]; 
-% PID1 = [210 0 5.5]; 
 
 % ==========================================
 % Transfer Functions
