@@ -1,9 +1,0 @@
-Removed Pin From Net: NetName=ENABLE1 Pin=NanoIn2-1
-Removed Pin From Net: NetName=DIREC1B Pin=NanoIn2-3
-Removed Pin From Net: NetName=ENABLE1 Pin=NanoOut2-1
-Removed Pin From Net: NetName=DIREC1B Pin=NanoOut2-3
-Added Pin To Net: NetName=DIREC1B Pin=NanoIn2-1
-Added Pin To Net: NetName=ENABLE1 Pin=NanoIn2-3
-Added Pin To Net: NetName=DIREC1B Pin=NanoOut2-1
-Added Pin To Net: NetName=ENABLE1 Pin=NanoOut2-3
-Added Room: Name=PCB
