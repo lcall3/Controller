@@ -1,8 +1,3 @@
-% This script contains all physical constants and specifications for the
-% SLS 3-D Printer
-
-% Start with a clean slate
-% Erase entire Matlab environment
 clear all;
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -34,77 +29,72 @@ Distance   	= 1;          	% Distance from laser to screen      	(m)
 JointX		= 1;			% Horizontal displacement from Motor 0 	(m)
 JointY 		= 1;			% Vertical displacement from Motor 0	(m)
 
-Width_laser = 0.01;			% Diameter of laser 					(m)
+% Laser
+LaserWidth = 0.01;			% Diameter of laser 					(m)
+MotorOffset = 0.02;
+
+% Center axle parameters
+RodLength = 0;
+RodRadius = 0;
+RodInnerRadius = 0;
+RodWeight = 0;
+
+% Weight of 3D printed motor casing
+CasingWeight = 0;
 
 % Material & Spring Constant
 RhoJoint   	= 1;           	% Density of Joint Material
 
 % Coeff of static friction
-% Amount of torque required to set a body in motion which has a given
-% amount of radial force being applied to it (usually due to gravity)
 uSF    = 700;            	% (um) = (uNm/N)
 
 % Joint Limit
-JntLim = 180;             % Q1 only (deg)
+JntLim = 180;
 
+% Supplied Voltage
+Vss = 12;
 
 %%%%%%%%%%%%%%%%%%
-% Motor 0		 %
+% Motor 		 %
 %%%%%%%%%%%%%%%%%%
 
-NomI0   = 3.2;                 					% Max average current
-StallI0 = 6.031;                				% Max peak current (A)
-V_nom0 	= 12;
+NomCurrent   		= 3.2;                 				% Max average current
+StallCurrent 		= 6.031;                			% Max peak current (A)
+NomVoltage 			= 12;
 
-Diam_m0	 		= 0.03;       							% Motor Diameter (m)
-r_m0 			= Diam_m0 / 2;							% Motor Radius (m)
-Length_m0 		= 0.047;             					% Motor Length (m)
-%% Find weight!!
-Weight_m0		= 0.05;             					% Motor Weight (kg)
+MotorDiam	 		= 0.03;       						% Motor Diameter (m)
+MotorRadius 		= MotorDiam / 2;					% Motor Radius (m)
+MotorLength 		= 0.047;             				% Motor Length (m)
+MotorWeight			= 0.114;             					% Motor Weight (kg)
 
-J_rotor0			= Sml;
 
 % Armature Resistance and Inductance
-R_a0 = 1.75;										% Ohms
-L_a0 = 0.00112;										% H
+Ra = 8.4;												% Ohms
+La = 1.12e-3;											% H
+
+
 
 % Torque Constant
-K_T0 = 	157.45/1000;								% Convert from mNm/A to (Nm/A)
+KTorque = 	23.54/1000;									% Convert from mNm/A to (Nm/A)
+
 
 % Back EMF Constant
-K_B0 = 93.31*RadPSecPerRPM;							% Convert rmp/V to ((rad/s)/V)
+KEmf = 630*RadPSecPerRPM;								% Convert rmp/V to ((rad/s)/V)
+
 
 % No load values
-I_noload0 = 0.19;									% A
-w_noload0 = 7200 * RadPSecPerRPM;					% Convert from rmp to rad/s
+NoLoadCurrent = 0.135;									% A
+NoLoadSpeed = 6114 * RadPSecPerRPM;						% Convert from rmp to rad/s
+
+JRotor = 5.932e-6;
+
+PWMConversion = [-1.3118e-8 8.6063e-6 -2.0381e-3 0.2134 -0.33242];
+
+StaticFric = 12e-3;
 
 
-%%%%%%%%%%%%%%%%%%
-% Motor 1		 %
-%%%%%%%%%%%%%%%%%%
-
-NomI1   = 3.2;                 					% Max average current
-StallI1 = 6.031;                				% Max peak current (A)
-V_nom1 	= 12;
-
-Diam_m1	 		= 0.03;       							% Motor Diameter (m)
-r_m1 			= Diam_m1 / 2;							% Motor Radius (m)
-Length_m1 		= 0.047;             					% Motor Length (m)
-%% Find weight!!
-Weight_m1		= 0.05;             					% Motor Weight (kg)
-
-J_rotor1			= Sml;
-
-% Armature Resistance and Inductance
-R_a1 = 1.75;										% Ohms
-L_a1 = 0.00112;										% H
-
-% Torque Constant
-K_T1 = 	157.45/1000;								% Convert from mNm/A to (Nm/A)
-
-% Back EMF Constant
-K_B1 = 93.31*RadPSecPerRPM;							% Convert rmp/V to ((rad/s)/V)
-
-% No load values
-I_noload1 = 0.19;									% A
-w_noload1 = 7200 * RadPSecPerRPM;					% Convert from rmp to rad/s
+	
+% Kinetic Friction
+% Kinetic friction = torque / speed 
+KineticFriction = KTorque * NoLoadCurrent / NoLoadSpeed;			
+% No load condition implies input torque = torque lost to friction	

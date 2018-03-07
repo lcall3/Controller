@@ -55,10 +55,6 @@ KFeedback = 1;
 % ==========================
 
 
-% Kinetic Friction
-F_kf = K_T1 * I_noload1 / w_noload1;			% Kinetic friction = torque / speed 
-												% No load condition implies input torque = torque lost to friction
-	
 % =============================
 % Q1 : Rotation about x-axis
 % =============================
