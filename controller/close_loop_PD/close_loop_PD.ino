@@ -1,5 +1,5 @@
-// This sketch implements a closed loop response for a simple P controller
-// This only implements a simple motor
+// This sketch implements a closed loop response for a simple PD controller
+// This only implements a single motor
 //
 // Last edited: 2018-03-06
 // Contributor: Muchen He
@@ -8,7 +8,7 @@
 
 // Parameters
 #define PULSE_PER_REV 400           // [*] Pulses per revolution of encoder
-#define TEST_STEP_DESIRED_POS 200  // [*] Desired position
+#define TEST_STEP_DESIRED_POS 2000  // [*] Desired position
 #define SERIAL_DELAY 10             // [*] Number of count before serial is sent
 
 // Testing flags (put '_' at the end to turn the flag off)
@@ -28,7 +28,8 @@
 #endif
 
 // PID Values
-#define P_GAIN 0.05f    // [*]
+#define P_GAIN 0.03f    // [*]
+#define D_GAIN 0.002f  // [*]
 
 // Pins
 #define Q0_ENCODER_A 5          // PORTD 5
@@ -167,9 +168,10 @@ void setup() {
 void loop() {
 
     // Compute control PWM
-    q0_pwm = int(P_GAIN * (q0_desired_pos - q0_position));
-
-    // Prepare PWM for control
+    q0_pwm = int(
+        (P_GAIN * (q0_desired_pos - q0_position)) + 
+        (D_GAIN * q0_speed)
+    );
     digitalWrite(Q0_DIR_A, q0_pwm > 0);
     digitalWrite(Q0_DIR_B, q0_pwm < 0);
     q0_pwm = abs(q0_pwm);
@@ -186,7 +188,7 @@ void loop() {
     if (output_serial) {
         Serial.print(q0_position, DEC);
         Serial.print(" ");
-        Serial.println((digitalRead(Q0_DIR_A) == LOW ? (digitalRead(Q0_DIR_B) == LOW ? 0 : -1) : 1) * q0_pwm, DEC);
+        Serial.println(q0_pwm, DEC);
         output_serial = false;
     }
 
