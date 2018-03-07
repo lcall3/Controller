@@ -7,28 +7,28 @@
 #include "PinChangeInterrupt.h"
 
 // Parameters
-#define PULSE_PER_REV 400           // Pulses per revolution of encoder
-#define TEST_STEP_DESIRED_POS 200   // Desired position
-#define SERIAL_DELAY 10             // Number of count before serial is sent
+#define PULSE_PER_REV 400           // [*] Pulses per revolution of encoder
+#define TEST_STEP_DESIRED_POS 2000  // [*] Desired position
+#define SERIAL_DELAY 10             // [*] Number of count before serial is sent
 
 // Testing flags (put '_' at the end to turn the flag off)
-#define LIMIT_PWM
-#define USE_DIGITAL_READ_
-#define UNIT_SQUARE
+#define LIMIT_PWM           // [*]
+#define USE_DIGITAL_READ_   // [*]
+#define UNIT_SQUARE         // [*]
 
 // PID Limiter
 #ifdef LIMIT_PWM
-#define K_MIN 30
-#define K_MAX 80
+#define K_MIN 30    // [*]
+#define K_MAX 80    // [*]
 #endif
 
-// Square step response 
+// Square step response
 #ifdef UNIT_SQUARE
-#define UNIT_SQUARE_CYCLE_TIME 500
+#define UNIT_SQUARE_CYCLE_TIME 2000 // [*]
 #endif
 
 // PID Values
-#define P_GAIN 0.05f
+#define P_GAIN 0.05f    // [*]
 
 // Pins
 #define Q0_ENCODER_A 5          // PORTD 5
