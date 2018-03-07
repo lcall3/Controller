@@ -1,12 +1,34 @@
 // This sketch implements a closed loop response for a simple P controller
 // This only implements a simple motor
+//
+// Last edited: 2018-03-06
+// Contributor: Muchen He
 
 #include "PinChangeInterrupt.h"
 
 // Parameters
-#define PULSE_PER_REV 400       // Pulses per revolution of encoder
+#define PULSE_PER_REV 400           // Pulses per revolution of encoder
+#define TEST_STEP_DESIRED_POS 200   // Desired position
+#define SERIAL_DELAY 10             // Number of count before serial is sent
 
-// #define LIMIT_PWM
+// Testing flags (put '_' at the end to turn the flag off)
+#define LIMIT_PWM
+#define USE_DIGITAL_READ_
+#define UNIT_SQUARE
+
+// PID Limiter
+#ifdef LIMIT_PWM
+#define K_MIN 30
+#define K_MAX 80
+#endif
+
+// Square step response 
+#ifdef UNIT_SQUARE
+#define UNIT_SQUARE_CYCLE_TIME 500
+#endif
+
+// PID Values
+#define P_GAIN 0.05f
 
 // Pins
 #define Q0_ENCODER_A 5          // PORTD 5
@@ -30,17 +52,34 @@ volatile bool q0_speed_changed;
 // Tracked position
 volatile long q0_position;
 
+// Desired position
+int q0_desired_pos;
+
 // Serial counter
-volatile uint16_t serial_count;
+volatile uint16_t scounter;
+
+// ISR Control flags
+volatile boolean output_serial;
+#ifdef UNIT_SQUARE
+volatile boolean toggle_unit_square;
+#endif
 
 // External (pin change) interrupt service routines
 void q0_encoderA_ISR() {
     q0_encoderA ^ q0_encoderB ? q0_encoder_pos_change++ : q0_encoder_pos_change--;
+    #ifdef USE_DIGITAL_READ
+    q0_encoderA = digitalRead(Q0_ENCODER_A);
+    #else
     q0_encoderA = PIND & (1 << Q0_ENCODER_A);
+    #endif
 }
 
 void q0_encoderB_ISR() {
+    #ifdef USE_DIGITAL_READ
+    q0_encoderB = digitalRead(Q0_ENCODER_B);
+    #else
     q0_encoderB  = PIND & (1 << Q0_ENCODER_B);
+    #endif
     q0_encoderA ^ q0_encoderB ? q0_encoder_pos_change++ : q0_encoder_pos_change--;
 }
 
@@ -51,7 +90,17 @@ ISR(TIMER1_COMPA_vect) {
     q0_speed_changed      = true;
     q0_encoder_pos_change = 0;
 
-    serial_count++;
+    // Change flags based on counter value
+    if (scounter % SERIAL_DELAY == 0)
+        output_serial = true;
+
+    #ifdef UNIT_SQUARE
+    if (scounter % UNIT_SQUARE_CYCLE_TIME == 0)
+        toggle_unit_square = true;
+    #endif
+
+    // Update counter
+    scounter++;
 }
 
 // Timer1 compare output setup function
@@ -86,10 +135,13 @@ void setup() {
     q0_encoder_pos_change = 0;
     q0_speed              = 0;
     q0_speed_changed      = false;
+    q0_desired_pos        = TEST_STEP_DESIRED_POS;
 
-    serial_count = 0;
+    scounter = 0;
+    output_serial = false;
 
-    #ifdef Q0_USING_CURRENT_DRIVER
+    #ifdef UNIT_SQUARE
+    toggle_unit_square = false;
     #endif
 
     // Set encoder input interrupts
@@ -112,31 +164,39 @@ void setup() {
     Serial.begin(115200);
 }
 
-int q0_desired_pos = 1000;
-
-#ifdef LIMIT_PWM 
-#define K_MIN 30
-#define K_MAX 80
-#endif
-
-#define P_GAIN 0.05f
-
 void loop() {
+
+    // Compute control PWM
     q0_pwm = int(P_GAIN * (q0_desired_pos - q0_position));
     digitalWrite(Q0_DIR_A, q0_pwm > 0);
     digitalWrite(Q0_DIR_B, q0_pwm < 0);
     q0_pwm = abs(q0_pwm);
 
+    // Limit PWM
     #ifdef LIMIT_PWM
     q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
     #endif
 
+    // Send PWM output
     analogWrite(Q0_EN_PIN, q0_pwm);
 
-    if (serial_count == 10) {
-        serial_count = 0;
+    // Send to Serial when output flag is enabled
+    if (output_serial) {
         Serial.print(q0_position, DEC);
         Serial.print(" ");
         Serial.println(q0_pwm, DEC);
+        output_serial = false;
     }
+
+    // Change desired position when its corresponding flag is enabled
+    #ifdef UNIT_SQUARE
+    if (toggle_unit_square) {
+        if (q0_desired_pos != 0) {
+            q0_desired_pos = 0;
+        } else {
+            q0_desired_pos = TEST_STEP_DESIRED_POS;
+        }
+        toggle_unit_square = false;
+    }
+    #endif
 }
