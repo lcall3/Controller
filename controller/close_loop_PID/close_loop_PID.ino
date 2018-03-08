@@ -1,7 +1,7 @@
 // This sketch implements a closed loop response for a simple P controller
 // This only implements a simple motor
 //
-// Last edited: 2018-03-06
+// Last edited: 2018-03-07
 // Contributor: Muchen He
 
 #include "PinChangeInterrupt.h"
@@ -12,25 +12,25 @@
 #define SERIAL_DELAY 10             // [*] Number of count before serial is sent
 
 // Testing flags (put '_' at the end to turn the flag off)
-#define LIMIT_PWM           // [*]
-#define USE_DIGITAL_READ_   // [*]
-#define UNIT_SQUARE         // [*]
+#define LIMIT_PWM                   // [*]
+#define USE_DIGITAL_READ_           // [*]
+#define UNIT_SQUARE                 // [*]
 
 // PID Limiter
 #ifdef LIMIT_PWM
-#define K_MIN 30    // [*]
-#define K_MAX 80    // [*]
+#define K_MIN 30                    // [*]
+#define K_MAX 80                    // [*]
 #endif
 
 // Square step response
 #ifdef UNIT_SQUARE
-#define UNIT_SQUARE_CYCLE_TIME 100 // [*]
+#define UNIT_SQUARE_CYCLE_TIME 200  // [*]
 #endif
 
 // PID Values
-#define P_GAIN 1.6f    // [*]
-#define D_GAIN -42.5f    // [*]
-#define I_GAIN 0.0000f      // [*]
+#define P_GAIN 1.6f                 // [*]
+#define D_GAIN -42.5f               // [*]
+#define I_GAIN 0.0000f              // [*]
 
 // Pins
 #define Q0_ENCODER_A 5          // PORTD 5
@@ -49,7 +49,6 @@ volatile int q0_encoder_pos_change;
 
 // Encoder speed
 volatile int q0_speed;
-volatile bool q0_speed_changed;
 
 // Tracked position
 volatile long q0_position;
@@ -65,6 +64,7 @@ volatile uint16_t scounter;
 
 // ISR Control flags
 volatile boolean output_serial;
+volatile boolean control_flag;
 #ifdef UNIT_SQUARE
 volatile boolean toggle_unit_square;
 #endif
@@ -92,8 +92,10 @@ void q0_encoderB_ISR() {
 ISR(TIMER1_COMPA_vect) {
     q0_position          += q0_encoder_pos_change;
     q0_speed              = q0_encoder_pos_change;
-    q0_speed_changed      = true;
     q0_encoder_pos_change = 0;
+
+    // Control flag
+    control_flag = true;
 
     // Change flags based on counter value
     if (scounter % SERIAL_DELAY == 0)
@@ -137,9 +139,9 @@ void setup() {
     // Reset values
     q0_encoderA           = false;
     q0_encoderB           = false;
+    control_flag          = false;
     q0_encoder_pos_change = 0;
     q0_speed              = 0;
-    q0_speed_changed      = false;
     q0_desired_pos        = TEST_STEP_DESIRED_POS;
     q0_accum              = 0;
 
@@ -173,29 +175,34 @@ void setup() {
 void loop() {
 
     // Compute control PWM
-    q0_pwm = int(P_GAIN * (q0_desired_pos - q0_position));
-    q0_pwm += D_GAIN * q0_speed;
-    q0_accum += (q0_desired_pos - q0_position);
-    q0_pwm += I_GAIN * q0_accum;
-    digitalWrite(Q0_DIR_A, q0_pwm > 0);
-    digitalWrite(Q0_DIR_B, q0_pwm < 0);
-    q0_pwm = abs(q0_pwm);
+    if (control_flag) {
+        control_flag = false;
 
-    // Limit PWM
-    #ifdef LIMIT_PWM
-    q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
-    #endif
+        // Integrate position error
+        q0_accum += (q0_desired_pos - q0_position);
 
-    // Send PWM output
-    analogWrite(Q0_EN_PIN, q0_pwm);
+        // Compute PWM
+        q0_pwm  = int(P_GAIN * (q0_desired_pos - q0_position));
+        q0_pwm += D_GAIN * q0_speed;
+        q0_pwm += I_GAIN * q0_accum;
+
+        // Set direction and abs PWM
+        digitalWrite(Q0_DIR_A, q0_pwm > 0);
+        digitalWrite(Q0_DIR_B, q0_pwm < 0);
+        q0_pwm = abs(q0_pwm);
+
+        // Limit PWM
+        #ifdef LIMIT_PWM
+        q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
+        #endif
+
+        // Send PWM output
+        analogWrite(Q0_EN_PIN, q0_pwm);
+    }
 
     // Send to Serial when output flag is enabled
     if (output_serial) {
-//        Serial.print(q0_accum, DEC);
-//        Serial.print(" ");
         Serial.println(q0_position, DEC);
-//        Serial.print(" ");
-//        Serial.println(q0_pwm, DEC);
         output_serial = false;
     }
 
