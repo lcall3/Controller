@@ -52,9 +52,12 @@ final float ACCEL_K = 0.15f;
 final float ACCEL_LIMIT = 0.08f;
 final float VEL_B = 0.5f;
 final float FRATE = 1.0f;
-PVector position = new PVector(0, 0);
-PVector velocity = new PVector(0, 0);
-PVector acceleration = new PVector(0, 0);
+final boolean DRAW_LINES = true;
+final int REFRESH_OPACITY = 30;
+PVector position;
+PVector position_prev;
+PVector velocity;
+PVector acceleration;
 PGraphics screen;
 
 public void setup() {
@@ -67,6 +70,11 @@ public void setup() {
     
     dash = new DashedLines(this);
     dash.pattern(5);
+    
+    position = new PVector(0, 0);
+    position_prev = new PVector(0, 0);
+    velocity = new PVector(0, 0);
+    acceleration = new PVector(0, 0);
     
     screen = createGraphics(600, 600);
     frameRate(60);
@@ -256,18 +264,30 @@ public void drawTracer() {
         acceleration = nowL.copy().sub(position).mult(ACCEL_K).limit(ACCEL_LIMIT);
         velocity.mult(VEL_B);
         velocity.add(acceleration);
+        position_prev = position.copy();
         position.add(velocity);
         
         // Draw laser
         PVector posS = toScreenCoords(position);
+        PVector posSp = toScreenCoords(position_prev);
         screen.beginDraw();
         screen.noStroke();
-        screen.fill(0, 30);
+        screen.fill(0, REFRESH_OPACITY);
         screen.rect(0, 0, 600, 600);
-        screen.fill(255, 0, 0);
-        screen.ellipse(posS.x - left, posS.y - top, 8, 8);
-        screen.fill(255);
-        screen.ellipse(posS.x - left, posS.y - top, 5, 5);
+        
+        if (DRAW_LINES) {
+            screen.stroke(255, 0, 0);
+            screen.strokeWeight(8);
+            screen.line(posS.x - left, posS.y - top, posSp.x - left, posSp.y - top);
+            screen.stroke(255);
+            screen.strokeWeight(3);
+            screen.line(posS.x - left, posS.y - top, posSp.x - left, posSp.y - top);
+        } else {
+            screen.fill(255, 0, 0);
+            screen.ellipse(posS.x - left, posS.y - top, 8, 8);
+            screen.fill(255);
+            screen.ellipse(posS.x - left, posS.y - top, 5, 5);
+        }
         screen.endDraw();
     } catch (IndexOutOfBoundsException e) {
         println("Deletion happened at wrong time");
