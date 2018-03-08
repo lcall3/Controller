@@ -38,6 +38,7 @@
 #define Q0_EN_PIN 11
 #define Q0_DIR_A A0             // Using analog pins as digital IO
 #define Q0_DIR_B A1
+#define Q0_HOME 7               // Homing pin
 
 // PWN control
 int q0_pwm;
@@ -191,11 +192,7 @@ void loop() {
 
     // Send to Serial when output flag is enabled
     if (output_serial) {
-//        Serial.print(q0_accum, DEC);
-//        Serial.print(" ");
         Serial.println(q0_position, DEC);
-//        Serial.print(" ");
-//        Serial.println(q0_pwm, DEC);
         output_serial = false;
     }
 
