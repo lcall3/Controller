@@ -8,7 +8,7 @@
 
 // Parameters
 #define PULSE_PER_REV 400           // [*] Pulses per revolution of encoder
-#define TEST_STEP_DESIRED_POS 100   // [*] Desired position
+#define TEST_STEP_DESIRED_POS 50    // [*] Desired position
 #define SERIAL_DELAY 10             // [*] Number of count before serial is sent
 
 // Testing flags (put '_' at the end to turn the flag off)
@@ -24,13 +24,16 @@
 
 // Square step response
 #ifdef UNIT_SQUARE
-#define UNIT_SQUARE_CYCLE_TIME 100 // [*]
+#define UNIT_SQUARE_CYCLE_TIME 200 // [*]
 #endif
 
 // PID Values
 #define P_GAIN 1.6f    // [*]
 #define D_GAIN -42.5f    // [*]
 #define I_GAIN 0.0000f      // [*]
+
+// Initial PWM Value for Homing
+#define INIT_PWM 60
 
 // Pins
 #define Q0_ENCODER_A 5          // PORTD 5
@@ -69,6 +72,9 @@ volatile boolean output_serial;
 #ifdef UNIT_SQUARE
 volatile boolean toggle_unit_square;
 #endif
+
+// State Machine
+char state;
 
 // External (pin change) interrupt service routines
 void q0_encoderA_ISR() {
@@ -144,6 +150,9 @@ void setup() {
     q0_desired_pos        = TEST_STEP_DESIRED_POS;
     q0_accum              = 0;
 
+    // State
+    state = 0;
+
     scounter = 0;
     output_serial = false;
 
@@ -173,39 +182,55 @@ void setup() {
 
 void loop() {
 
-    // Compute control PWM
-    q0_pwm = int(P_GAIN * (q0_desired_pos - q0_position));
-    q0_pwm += D_GAIN * q0_speed;
-    q0_accum += (q0_desired_pos - q0_position);
-    q0_pwm += I_GAIN * q0_accum;
-    digitalWrite(Q0_DIR_A, q0_pwm > 0);
-    digitalWrite(Q0_DIR_B, q0_pwm < 0);
-    q0_pwm = abs(q0_pwm);
-
-    // Limit PWM
-    #ifdef LIMIT_PWM
-    q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
-    #endif
-
-    // Send PWM output
-    analogWrite(Q0_EN_PIN, q0_pwm);
-
-    // Send to Serial when output flag is enabled
-    if (output_serial) {
-        Serial.println(q0_position, DEC);
-        output_serial = false;
+    // INIT STATE
+    if (state == 0) {
+        q0_pwm = INIT_PWM;
+        digitalWrite(Q0_DIR_A, 1);
+        digitalWrite(Q0_DIR_B, 0);
+        // Send PWM output
+        analogWrite(Q0_EN_PIN, q0_pwm);
+        while (digitalRead(Q0_HOME) == HIGH);
+        // Set to OPERATING STATE
+        state = 1;
+        q0_position = 90;
     }
 
-    // Change desired position when its corresponding flag is enabled
-    #ifdef UNIT_SQUARE
-    if (toggle_unit_square) {
-        q0_accum = 0;
-        if (q0_desired_pos != 0) {
-            q0_desired_pos = 0;
-        } else {
-            q0_desired_pos = TEST_STEP_DESIRED_POS;
-        }
-        toggle_unit_square = false;
+    // OPERATING STATE
+    else {
+      // Compute control PWM
+      q0_pwm = int(P_GAIN * (q0_desired_pos - q0_position));
+      q0_pwm += D_GAIN * q0_speed;
+      q0_accum += (q0_desired_pos - q0_position);
+      q0_pwm += I_GAIN * q0_accum;
+      digitalWrite(Q0_DIR_A, q0_pwm > 0);
+      digitalWrite(Q0_DIR_B, q0_pwm < 0);
+      q0_pwm = abs(q0_pwm);
+  
+      // Limit PWM
+      #ifdef LIMIT_PWM
+      q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
+      #endif
+  
+      // Send PWM output
+      analogWrite(Q0_EN_PIN, q0_pwm);
+  
+      // Send to Serial when output flag is enabled
+      if (output_serial) {
+          Serial.println(q0_position, DEC);
+          output_serial = false;
+      }
+  
+      // Change desired position when its corresponding flag is enabled
+      #ifdef UNIT_SQUARE
+      if (toggle_unit_square) {
+          q0_accum = 0;
+          if (q0_desired_pos > 0) {
+              q0_desired_pos = -TEST_STEP_DESIRED_POS;
+          } else {
+              q0_desired_pos = TEST_STEP_DESIRED_POS;
+          }
+          toggle_unit_square = false;
+      }
+      #endif
     }
-    #endif
 }
