@@ -81,6 +81,7 @@ void drawCanvas() {
     rect(width/2, height/2, 600, 600);
     line(left+300, top, left+300, bottom);
     line(left, top+300, right, top+300);
+    ellipse(width/2, height/2, 300, 300);
     fill(255);
     textSize(20);
     text("Canvas", left, top);
@@ -174,7 +175,8 @@ void drawTrail() {
             stroke(
                 map(i, 0, l, 0, 5),
                 map(i, 0, l, 242, 117),
-                map(i, 0, l, 96, 230)
+                map(i, 0, l, 96, 230),
+                80
             );
             line(prev.x, prev.y, current.x, current.y);
             

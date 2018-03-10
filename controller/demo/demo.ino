@@ -1,3 +1,20 @@
+//##########################################################################
+//
+// lcall3 Controller is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// lcall3 Controller is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with lcall3 Controller. If not, see <http://www.gnu.org/licenses/>.
+// 
+//##########################################################################
+
 // This sketch is the final sketch. Hopefully. 
 // This is for the base motor
 //
@@ -212,57 +229,57 @@ void loop() {
 
     // OPERATING STATE
     else {
-      // Compute control PWM
-      if (control_flag) {
-          control_flag = false;
+        // Compute control PWM
+        if (control_flag) {
+            control_flag = false;
 
-          // Integrate position error
-          q0_accum += (q0_desired_pos - q0_position);
+            // Integrate position error
+            q0_accum += (q0_desired_pos - q0_position);
 
-          // Compute PWM
-          q0_pwm  = int(P_GAIN * (q0_desired_pos - q0_position));
-          q0_pwm += D_GAIN * q0_speed;
-          q0_pwm += I_GAIN * q0_accum;
+            // Compute PWM
+            q0_pwm  = int(P_GAIN * (q0_desired_pos - q0_position));
+            q0_pwm += D_GAIN * q0_speed;
+            q0_pwm += I_GAIN * q0_accum;
 
-          // Set direction and abs PWM
-          digitalWrite(Q0_DIR_A, q0_pwm > 0);
-          digitalWrite(Q0_DIR_B, q0_pwm < 0);
-          q0_pwm = abs(q0_pwm);
+            // Set direction and abs PWM
+            digitalWrite(Q0_DIR_A, q0_pwm > 0);
+            digitalWrite(Q0_DIR_B, q0_pwm < 0);
+            q0_pwm = abs(q0_pwm);
 
-          // Limit PWM
-          #ifdef LIMIT_PWM
-          q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
-          #endif
+            // Limit PWM
+            #ifdef LIMIT_PWM
+            q0_pwm = constrain(q0_pwm, K_MIN, K_MAX);
+            #endif
 
-          // Send PWM output
-          analogWrite(Q0_EN_PIN, q0_pwm);
-      }
+            // Send PWM output
+            analogWrite(Q0_EN_PIN, q0_pwm);
+        }
 
-      // Send to Serial when output flag is enabled
-      if (output_serial) {
-          Serial.println(q0_position, DEC);
-          output_serial = false;
-      }
+        // Send to Serial when output flag is enabled
+        if (output_serial) {
+            Serial.println(q0_position, DEC);
+            output_serial = false;
+        }
 
-      // Change desired position when its corresponding flag is enabled
-      #ifdef UNIT_SQUARE
-      if (toggle_unit_square) {
-          if (digitalRead(DEMO_TOGGLE) == HIGH) {
-              if (q0_desired_pos > 0) {
-                  q0_desired_pos = -TEST_STEP_DESIRED_POS;
-              } else {
-                  q0_desired_pos = TEST_STEP_DESIRED_POS;
-              }
-          } else {
-              if (q0_desired_pos > 0) {
-                  q0_desired_pos = -TEST_STEP_DESIRED_POS_1;
-              } else {
-                  q0_desired_pos = TEST_STEP_DESIRED_POS_1;
-              }
-          }
-          
-          toggle_unit_square = false;
-      }
-      #endif
+        // Change desired position when its corresponding flag is enabled
+        #ifdef UNIT_SQUARE
+        if (toggle_unit_square) {
+            if (digitalRead(DEMO_TOGGLE) == HIGH) {
+                if (q0_desired_pos > 0) {
+                    q0_desired_pos = -TEST_STEP_DESIRED_POS;
+                } else {
+                    q0_desired_pos = TEST_STEP_DESIRED_POS;
+                }
+            } else {
+                if (q0_desired_pos > 0) {
+                    q0_desired_pos = -TEST_STEP_DESIRED_POS_1;
+                } else {
+                    q0_desired_pos = TEST_STEP_DESIRED_POS_1;
+                }
+            }
+            
+            toggle_unit_square = false;
+        }
+        #endif
     }
 }
