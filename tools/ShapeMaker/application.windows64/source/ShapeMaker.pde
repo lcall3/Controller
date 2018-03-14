@@ -1,3 +1,16 @@
+// lcall3 Controller is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// lcall3 Controller is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with lcall3 Controller. If not, see <http://www.gnu.org/licenses/>.
+
 import garciadelcastillo.dashedlines.*;
 DashedLines dash;
 
@@ -16,6 +29,19 @@ final float maxTimeFactor = 2.0;
 ArrayList<PVector> verts = new ArrayList<PVector>();
 FloatList vertsTime = new FloatList();
 
+// Laser simulation
+final float ACCEL_K = 0.15;
+final float ACCEL_LIMIT = 0.08;
+final float VEL_B = 0.5;
+final float FRATE = 1.0;
+final boolean DRAW_LINES = true;
+final int REFRESH_OPACITY = 30;
+PVector position;
+PVector position_prev;
+PVector velocity;
+PVector acceleration;
+PGraphics screen;
+
 void setup() {
     size(1280, 800);
     
@@ -26,14 +52,24 @@ void setup() {
     
     dash = new DashedLines(this);
     dash.pattern(5);
+    
+    position = new PVector(0, 0);
+    position_prev = new PVector(0, 0);
+    velocity = new PVector(0, 0);
+    acceleration = new PVector(0, 0);
+    
+    screen = createGraphics(600, 600);
+    frameRate(60);
 }
 
 void draw() {
     background(0);
+    image(screen, left, top);
     drawCanvas();
     drawCursor();
     drawVertList();
     drawTrail();
+    drawTracer();
     drawInstructions();
 }
 
@@ -74,6 +110,11 @@ void mouseClicked() {
             float distance = verts.get(verts.size() - 1).dist(verts.get(verts.size() - 2));
             float time = map(distance, 0, 2, minTimeFactor * timeFactor, maxTimeFactor * timeFactor);
             vertsTime.append(time);
+            
+            // Get time vector to starting vertex
+            distance = verts.get(verts.size() - 1).dist(verts.get(0));
+            time = map(distance, 0, 2, minTimeFactor * timeFactor, maxTimeFactor * timeFactor);
+            vertsTime.set(0, time);
         } else {
             float time = map(verts.get(0).mag(), 0, 2, minTimeFactor * timeFactor, maxTimeFactor * timeFactor);
             vertsTime.append(time);
@@ -123,12 +164,12 @@ void drawVertList() {
 
 void drawTrail() {
     strokeWeight(2);
-    stroke(255, 255, 0);
     if (verts.size() > 1) {
         for (int i = 1, l = verts.size(); i < l; i++) {
             PVector current = toScreenCoords(verts.get(i));
             PVector prev = toScreenCoords(verts.get(i - 1));
             
+            stroke(255, 0, 0);
             ellipse(current.x, current.y, 5, 5);
             stroke(
                 map(i, 0, l, 0, 5),
@@ -146,11 +187,13 @@ void drawTrail() {
         
     } else if (verts.size() == 1){
         PVector current = toScreenCoords(verts.get(0));
+        stroke(255, 0, 0);
         ellipse(current.x, current.y, 5, 5);
     }
 }
 
 void writeShape() {
+    output.println("// THIS IS AN AUTO GENERATED FILE. DO NOT EDIT!");
     output.println("#ifdef " + shapeName.toUpperCase() + "_H");
     output.println("#define " + shapeName.toUpperCase() + "_H");
     output.println("#define N_VERTICES " + str(verts.size()));
@@ -177,6 +220,7 @@ void writeShape() {
 
 void drawInstructions() {
     textSize(20);
+    fill(255);
     text("ShapeMaker", 100, top);
     textSize(12);
     text("Click anywhere in the canvas to", 100, top + 14);
@@ -185,4 +229,60 @@ void drawInstructions() {
     text("The vertices are in sequential order.", 100, top + 56);
     text("Press BACKSPACE to delete last vertex.", 100, top + 84);
     text("Press SHIFT+S to save to file", 100, top + 112);
+}
+int currentVert = 0;
+int millis_prev;
+
+void drawTracer() {
+    if (verts.size() < 1) return;
+    
+    try {
+        PVector nowL = verts.get(currentVert);
+        PVector now = toScreenCoords(nowL);
+        stroke(0, 255, 0);
+        ellipse(now.x, now.y, 8, 8);
+        
+        // Update laser position
+        acceleration = nowL.copy().sub(position).mult(ACCEL_K).limit(ACCEL_LIMIT);
+        velocity.mult(VEL_B);
+        velocity.add(acceleration);
+        position_prev = position.copy();
+        position.add(velocity);
+        
+        // Draw laser
+        PVector posS = toScreenCoords(position);
+        PVector posSp = toScreenCoords(position_prev);
+        screen.beginDraw();
+        screen.noStroke();
+        screen.fill(0, REFRESH_OPACITY);
+        screen.rect(0, 0, 600, 600);
+        
+        if (DRAW_LINES) {
+            screen.stroke(255, 0, 0);
+            screen.strokeWeight(8);
+            screen.line(posS.x - left, posS.y - top, posSp.x - left, posSp.y - top);
+            screen.stroke(255);
+            screen.strokeWeight(3);
+            screen.line(posS.x - left, posS.y - top, posSp.x - left, posSp.y - top);
+        } else {
+            screen.fill(255, 0, 0);
+            screen.ellipse(posS.x - left, posS.y - top, 8, 8);
+            screen.fill(255);
+            screen.ellipse(posS.x - left, posS.y - top, 5, 5);
+        }
+        screen.endDraw();
+    } catch (IndexOutOfBoundsException e) {
+        println("Deletion happened at wrong time");
+        currentVert = 0;
+        return;
+    }
+    
+    if ((millis() - millis_prev) * FRATE > vertsTime.get(currentVert)) {
+        millis_prev = millis();
+        if (currentVert == verts.size() - 1) {
+            currentVert = 0;
+        } else {
+            currentVert++;
+        }
+    }
 }
