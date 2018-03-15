@@ -53,3 +53,16 @@ dkms.conf
 .vscode/settings.json
 /*/slproj
 */.lck
+*.bc
+*.xml
+*.bc
+*.mat
+*.LOG
+*.Zip
+*.drc
+*.html
+*.SchDocPreview
+*.PcbDocPreview
+*.nsx
+*.TxtPreview
+*.nsxPreview

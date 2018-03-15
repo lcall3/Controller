@@ -16,7 +16,7 @@
 //##########################################################################
 
 void setup() {
-    pinMode(3, OUTPUT);
+    pinMode(10, OUTPUT);
     Serial.begin(9600);
 }
 
@@ -28,5 +28,7 @@ void loop() {
         pwm = msg.toInt();
         Serial.println(pwm, DEC);
     }
-    analogWrite(3, pwm);
+    analogWrite(10, pwm);
+    digitalWrite(6, 1);
+    digitalWrite(7, 0);
 }
