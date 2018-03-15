@@ -25,14 +25,14 @@
 
 // Pin layouts
 // Encoder input pins (uses pin change interrupts)
-#define ENCODER0_A 7
-#define ENCODER0_B 8
-#define ENCODER1_A 9
-#define ENCODER1_B 10
+#define ENCODER0_A 10
+#define ENCODER0_B 9
+#define ENCODER1_A 8
+#define ENCODER1_B 7
 
 // PWM motor control pins
-#define MOTOR0_EN 5
-#define MOTOR1_EN 6
+#define MOTOR0_EN 6
+#define MOTOR1_EN 5
 
 // Directional control pins
 #define MOTOR0_DIREC A0
