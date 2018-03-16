@@ -131,7 +131,7 @@ void setup() {
     // Initial state
     g_state = STATE_HOME_Q0_WAIT;
 
-    // Pin mode
+    // === === ===[ Set pin mode ]=== === ===
     // Encoder pins
     pinMode(ENCODER0_A, INPUT);
     pinMode(ENCODER0_B, INPUT);
@@ -143,8 +143,53 @@ void setup() {
     attachPCINT(digitalPinToPCINT(ENCODER0_B), q0_encoderB_ISR, CHANGE);
     attachPCINT(digitalPinToPCINT(ENCODER1_A), q1_encoderA_ISR, CHANGE);
     attachPCINT(digitalPinToPCINT(ENCODER1_B), q1_encoderB_ISR, CHANGE);
+
+    // Current driver output
+    pinMode(MOTOR0_EN, OUTPUT);
+    pinMode(MOTOR1_EN, OUTPUT);
+    // === === ===[ End of set pin mode ]=== === ===
+
+    // Initialize timer 1
+    init_timer1();
+
+    // Enable all interrupts
+    interrupts();
+
+    // Enable serial
+    #ifdef USE_SERIAL
+    Serial.begin(SERIAL_BAUD_RATE);
+    #endif
 }
 
 void loop() {
-
+    switch(g_state) {
+        case STATE_HOME_Q0_WAIT:
+            // TODO: finish state machine
+            g_state = STATE_HOME_Q0_REPOS;
+        break;
+        case STATE_HOME_Q0_REPOS:
+            // TODO: finish state machine
+            g_state = STATE_HOME_Q1_WAIT;
+        break;
+        case STATE_HOME_Q1_WAIT:
+            // TODO: finish state machine
+            g_state = STATE_HOME_Q1_REPOS;
+        break;
+        case STATE_HOME_Q1_REPOS:
+            // TODO: finish state machine
+            g_state = STATE_RUN;
+        break;
+        case STATE_RUN:
+            // TODO: finish state machine
+            g_state = STATE_HALT;
+        break;
+        case STATE_HALT:
+            // TODO: finish state machine
+            g_state = STATE_HALT;
+        break;
+        default:
+            // TODO: finish state machine
+            g_state = STATE_HALT;
+        break;
+    }
 }

@@ -27,9 +27,19 @@
 // Includes
 #include <Arduino.h>
 
-// Comment out to disable
+// [*]
 #define USE_SERIAL
 #define USE_DIGITALREAD
+
+// [*]
+#define SERIAL_BAUD_RATE 115200
+
+// [*]
+// Timer 1 control
+// Prescalers can be 1, 8, 64, 256, 1024
+#define TIMER1_PRESCALER 64
+#define TIMER1_DESIRED_FREQ 1000
+#define TIMER1_MATCH_VALUE = F_CPU / TIMER1_PRESCALER / TIMER1_DESIRED_FREQ
 
 // ISR functions
 void q0_encoderA_ISR();
@@ -57,12 +67,6 @@ long g_q1_accum_error;
 
 // Unsigned counter
 volatile unsigned int vg_counter;
-
-// Timer 1 control
-// Prescalers can be 1, 8, 64, 256, 1024
-#define TIMER1_PRESCALER 64
-#define TIMER1_DESIRED_FREQ 1000
-#define TIMER1_MATCH_VALUE = F_CPU / TIMER1_PRESCALER / TIMER1_DESIRED_FREQ
 
 // ISR timed control flags
 #ifdef USE_SERIAL
