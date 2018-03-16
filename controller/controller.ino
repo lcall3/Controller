@@ -18,15 +18,20 @@
 // Implementation of the Controller
 // This file is the controller entry points
 //
-// Last edited: 2018-03-15
+// Last edited: 2018-03-16
 // Contributor: Muchen He
 
 #include "PinChangeInterrupt.h"
 
 #include "controller.h"
 #include "lcall3.h"
+#include "experimental.h"
 
-// Timer 1 compare ISR
+/* Timer 1 compare output ISR
+ * Performs data acquisition and other controller flags
+ *
+ * EXEC TIME:   8-12us
+ */
 ISR(TIMER1_COMPA_vect) {
     // Update motor 0
     vg_q0_pos      += vg_q0_delta_pos;
@@ -45,7 +50,11 @@ ISR(TIMER1_COMPA_vect) {
     vg_counter++;
 }
 
-// Pin change ISR
+/* Encoder edge change interrupt service routines
+ * These ISR are attached to Pin Change Interrupts from encoder pins
+ *
+ * EXEC TIME:   4-8us each
+ */
 void q0_encoderA_ISR() {
     vg_q0_encoderA ^ vg_q0_encoderB ? vg_q0_delta_pos++ : vg_q0_delta_pos--;
     #ifdef USE_DIGITALREAD
@@ -54,7 +63,6 @@ void q0_encoderA_ISR() {
     vg_q0_encoderA = PIND & (1 << ENCODER0_A);      // FIXME: change port to match pin assignment
     #endif
 }
-
 void q0_encoderB_ISR() {
     #ifdef USE_DIGITALREAD
     vg_q0_encoderB = digitalRead(ENCODER0_B);
@@ -63,7 +71,6 @@ void q0_encoderB_ISR() {
     #endif
     vg_q0_encoderA ^ vg_q0_encoderB ? vg_q0_delta_pos++ : vg_q0_delta_pos--;
 }
-
 void q1_encoderA_ISR() {
     vg_q1_encoderA ^ vg_q1_encoderB ? vg_q1_delta_pos++ : vg_q1_delta_pos--;
     #ifdef USE_DIGITALREAD
@@ -72,7 +79,6 @@ void q1_encoderA_ISR() {
     vg_q1_encoderA = PIND & (1 << ENCODER1_A);      // FIXME: change port to match pin assignment
     #endif
 }
-
 void q1_encoderB_ISR() {
     #ifdef USE_DIGITALREAD
     vg_q1_encoderB = digitalRead(ENCODER1_B);
@@ -82,7 +88,11 @@ void q1_encoderB_ISR() {
     vg_q1_encoderA ^ vg_q1_encoderB ? vg_q1_delta_pos++ : vg_q1_delta_pos--;
 }
 
-// Timer 1 setup
+/* This function initializes the register that controls timer 1
+ * Timer 1 is set to compare match ouput
+ *
+ * EXEC TIME:   N/A
+ */
 inline void init_timer1() {
     // Rest timer 1 control
     TCCR1A = 0;
@@ -107,6 +117,10 @@ inline void init_timer1() {
     TIMSK1 |= (1 << OCIE1A);
 }
 
+/* Setup function that runs once at the very begging
+ *
+ * EXEC TIME:   N/A
+ */
 void setup() {
     // Reset and initialze values
     vg_q0_encoderA   = 0;
@@ -129,7 +143,10 @@ void setup() {
     #endif
 
     // Initial state
-    g_state = STATE_HOME_Q0_WAIT;
+    g_state = s_home_q0;
+
+    // Stop motor movements
+    stopAll();
 
     // === === ===[ Set pin mode ]=== === ===
     // Encoder pins
@@ -161,35 +178,84 @@ void setup() {
     #endif
 }
 
+/* Main program loop
+ * Contains the main state machine for motor controller
+ *
+ * EXEC TIME:   N/A
+ */
 void loop() {
     switch(g_state) {
-        case STATE_HOME_Q0_WAIT:
-            // TODO: finish state machine
-            g_state = STATE_HOME_Q0_REPOS;
+        case s_home_q0:
+            // This state should move motor 0 until it is homed
+            controlMotor(MOTOR0_EN, MOTOR0_MIN_MOVE_PWM);
+            if (digitalRead(HOMING0)) {
+                g_state = s_home_q1;
+                stopAll();
+            }
         break;
-        case STATE_HOME_Q0_REPOS:
-            // TODO: finish state machine
-            g_state = STATE_HOME_Q1_WAIT;
-        break;
-        case STATE_HOME_Q1_WAIT:
-            // TODO: finish state machine
-            g_state = STATE_HOME_Q1_REPOS;
-        break;
-        case STATE_HOME_Q1_REPOS:
-            // TODO: finish state machine
-            g_state = STATE_RUN;
+        case s_home_q1:
+            // This state should move motor 1 until it is homed
+            controlMotor(MOTOR1_EN, MOTOR1_MIN_MOVE_PWM);
+            if (digitalRead(HOMING1)) {
+                g_state = s_run;
+                stopAll();
+            }
         break;
         case STATE_RUN:
+            if (g_halt) {
+                g_state = s_halt;
+            }
+
             // TODO: finish state machine
-            g_state = STATE_HALT;
         break;
-        case STATE_HALT:
-            // TODO: finish state machine
-            g_state = STATE_HALT;
+        case s_halt:
+            g_state = s_halt;
         break;
         default:
-            // TODO: finish state machine
-            g_state = STATE_HALT;
+            g_state = s_halt;
         break;
     }
+}
+
+/* Use analogWrite to control each of the motors
+ *
+ * PARAM motor: motor enable pins of the motor we want to control
+ * PARAM pwm:   desired motor pwm to be sent
+ *
+ * EXEC TIME:   
+ */
+void controlMotor(char motor, int pwm) {
+    if (motor == MOTOR0_EN) {
+
+        // Set direction of motor movement
+        digitalWrite(MOTOR0_DIREC, pwm > 0);
+
+        // Set pwm
+        #ifdef USE_PWM_FLOOR
+        pwm = constrain(abs(pwm), PWM_FLOOR, 255);
+        #else
+        pwm = abs(pwm);
+        #endif
+
+        // Write to pin
+        analogWrite(MOTOR0_EN, pwm);
+        
+    } else if (motor == MOTOR1_EN) {
+        digitalWrite(MOTOR1_DIREC, pwm > 0);
+        #ifdef USE_PWM_FLOOR
+        pwm = constrain(abs(pwm), PWM_FLOOR, 255);
+        #else
+        pwm = abs(pwm);
+        #endif
+        analogWrite(MOTOR1_EN, pwm);
+    }
+}
+
+/* Use analogWrite to control each of the motors
+ *
+ * EXEC TIME:   12us
+ */
+void stopAll() {
+    analogWrite(MOTOR0_EN, 0);
+    analogWrite(MOTOR1_EN, 0);
 }

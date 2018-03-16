@@ -18,7 +18,7 @@
 // This is a header for the controller implementation
 // Parameters for the controller should be chanced in this file
 //
-// Last edited: 2018-03-15
+// Last edited: 2018-03-16
 // Contributor: Muchen He
 
 #ifndef controller_h
@@ -30,6 +30,7 @@
 // [*]
 #define USE_SERIAL
 #define USE_DIGITALREAD
+#define USE_PWM_FLOOR
 
 // [*]
 #define SERIAL_BAUD_RATE 115200
@@ -40,6 +41,11 @@
 #define TIMER1_PRESCALER 64
 #define TIMER1_DESIRED_FREQ 1000
 #define TIMER1_MATCH_VALUE = F_CPU / TIMER1_PRESCALER / TIMER1_DESIRED_FREQ
+
+// [*]
+#ifdef USE_PWM_FLOOR
+#define PWM_FLOOR 30
+#endif
 
 // ISR functions
 void q0_encoderA_ISR();
@@ -75,12 +81,12 @@ volatile char vg_output_serial;
 volatile char vg_control_flag;
 
 // Main state machine
-#define STATE_HOME_Q0_WAIT 0
-#define STATE_HOME_Q0_REPOS 1
-#define STATE_HOME_Q1_WAIT 2
-#define STATE_HOME_Q1_REPOS 3
-#define STATE_RUN 4
-#define STATE_HALT 5
+enum states {s_home_q0, s_home_q1, s_run, s_halt};
 char g_state;
+boolean g_halt;
+
+// === === ===[ Function prototypes ]=== === ===
+void controlMotor(char, int);
+void stopAll();
 
 #endif
