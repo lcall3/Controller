@@ -144,6 +144,7 @@ void setup() {
 
     // Initial state
     g_state = s_home_q0;
+    g_halt = 0;
 
     // Stop motor movements
     stopAll();
@@ -202,11 +203,13 @@ void loop() {
             }
         break;
         case STATE_RUN:
+            
+            /* Enter nominal operation code here */
+
+            // Stop state machine if halt flag is set to true
             if (g_halt) {
                 g_state = s_halt;
             }
-
-            // TODO: finish state machine
         break;
         case s_halt:
             g_state = s_halt;

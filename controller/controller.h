@@ -83,7 +83,7 @@ volatile char vg_control_flag;
 // Main state machine
 enum states {s_home_q0, s_home_q1, s_run, s_halt};
 char g_state;
-boolean g_halt;
+char g_halt;
 
 // === === ===[ Function prototypes ]=== === ===
 void controlMotor(char, int);
