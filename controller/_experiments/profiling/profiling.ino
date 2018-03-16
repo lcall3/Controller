@@ -26,6 +26,39 @@ void testSerial10Char() {
     Serial.print("123456789");
 }
 
+// TEST 5 ::: Timer ISR function
+long pos = 0;
+int pos_change = 300;
+int speed;
+boolean flag1, flag2;
+long counter;
+void testTimer1ISR() {
+    pos       += pos_change;
+    speed      = pos_change;
+    pos_change = 0;
+    flag1 = true;
+    flag2 = true;
+    counter = 0;
+    counter++;
+}
+
+// TEST 6 ::: Timer ISR function for dual motors
+long pos2 = 0;
+int pos_change2 = -365;
+int speed2;
+void testTimer1ISR2() {
+    pos       += pos_change;
+    speed      = pos_change;
+    pos_change = 0;
+    pos2      += pos_change2;
+    speed2     = pos_change2;
+    pos_change = 0;
+    flag1 = true;
+    flag2 = true;
+    counter = 0;
+    counter++;
+}
+
 // Run test helper function
 void runFunction(void (*fut)(), char testName[]) {
     Serial.print(testName);
@@ -58,6 +91,8 @@ void setup() {
     runFunction(&testISRDigitalRead, "ISR with pin reading from digitalRead()");
     runFunction(&testFloatToInt, "Speed of conversio from float to int");
     runFunction(&testSerial10Char, "Speed of serial print for 10 characters");
+    runFunction(&testTimer1ISR, "Timer 1 ISR single motor");
+    runFunction(&testTimer1ISR2, "Timer 1 ISR dual motor");
 }
 
 void loop() { }
