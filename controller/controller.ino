@@ -60,14 +60,14 @@ void q0_encoderA_ISR() {
     #ifdef USE_DIGITALREAD
     vg_q0_encoderA = digitalRead(ENCODER0_A);
     #else
-    vg_q0_encoderA = PIND & (1 << ENCODER0_A);      // FIXME: change port to match pin assignment
+    vg_q0_encoderA = PINB & 0x04;
     #endif
 }
 void q0_encoderB_ISR() {
     #ifdef USE_DIGITALREAD
     vg_q0_encoderB = digitalRead(ENCODER0_B);
     #else
-    vg_q0_encoderB  = PIND & (1 << ENCODER0_B);     // FIXME: change port to match pin assignment
+    vg_q0_encoderB = PINB & 0x02;
     #endif
     vg_q0_encoderA ^ vg_q0_encoderB ? vg_q0_delta_pos++ : vg_q0_delta_pos--;
 }
@@ -76,14 +76,14 @@ void q1_encoderA_ISR() {
     #ifdef USE_DIGITALREAD
     vg_q1_encoderA = digitalRead(ENCODER1_A);
     #else
-    vg_q1_encoderA = PIND & (1 << ENCODER1_A);      // FIXME: change port to match pin assignment
+    vg_q1_encoderA = PIND & 0x01;
     #endif
 }
 void q1_encoderB_ISR() {
     #ifdef USE_DIGITALREAD
     vg_q1_encoderB = digitalRead(ENCODER1_B);
     #else
-    vg_q1_encoderB  = PIND & (1 << ENCODER1_B);     // FIXME: change port to match pin assignment
+    vg_q1_encoderB = PIND & 0x80;
     #endif
     vg_q1_encoderA ^ vg_q1_encoderB ? vg_q1_delta_pos++ : vg_q1_delta_pos--;
 }
