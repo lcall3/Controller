@@ -27,6 +27,14 @@
 // Includes
 #include <Arduino.h>
 
+// [*] Q0 and Q1 PID gain
+#define K_P0 1.0f
+#define K_I0 0.0f
+#define K_D0 0.0f
+#define K_P1 1.0f
+#define K_I1 0.0f
+#define K_D1 0.0f
+
 // [*]
 #define USE_SERIAL
 #define USE_DIGITALREAD
@@ -54,12 +62,15 @@ void q1_encoderA_ISR();
 void q1_encoderB_ISR();
 
 // Global variables
+// Encoder vars
 volatile char vg_q0_encoderA;
 volatile char vg_q0_encoderB;
 volatile char vg_q1_encoderA;
 volatile char vg_q1_encoderB;
 volatile int vg_q0_delta_pos;
 volatile int vg_q1_delta_pos;
+
+// Tracked speed
 volatile int vg_q0_speed;
 volatile int vg_q1_speed;
 
@@ -67,12 +78,16 @@ volatile int vg_q1_speed;
 volatile int vg_q0_pos;
 volatile int vg_q1_pos;
 
+// Desired position
+int q0_desired;
+int q1_desired;
+
 // Accumulated position error
 long g_q0_accum_error;
 long g_q1_accum_error;
 
 // Unsigned counter
-volatile unsigned int vg_counter;
+volatile unsigned long vg_counter;
 
 // ISR timed control flags
 #ifdef USE_SERIAL
@@ -86,7 +101,8 @@ char g_state;
 char g_halt;
 
 // === === ===[ Function prototypes ]=== === ===
-void controlMotor(char, int);
-void stopAll();
+void control_motor(char, int);
+void stop_all();
+void apply_control();
 
 #endif

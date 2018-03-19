@@ -204,7 +204,8 @@ void loop() {
         break;
         case STATE_RUN:
             
-            /* Enter nominal operation code here */
+            // Normal controller code
+            apply_control();
 
             // Stop state machine if halt flag is set to true
             if (g_halt) {
@@ -227,7 +228,7 @@ void loop() {
  *
  * EXEC TIME:   
  */
-void controlMotor(char motor, int pwm) {
+void control_motor(char motor, int pwm) {
     if (motor == MOTOR0_EN) {
 
         // Set direction of motor movement
@@ -258,7 +259,35 @@ void controlMotor(char motor, int pwm) {
  *
  * EXEC TIME:   12us
  */
-void stopAll() {
+void stop_all() {
     analogWrite(MOTOR0_EN, 0);
     analogWrite(MOTOR1_EN, 0);
+}
+
+/* Apply the PID control to both motors
+ *
+ * EXEC TIME: unknown
+ */
+void apply_control() {
+    // Only control when control flag is set to true
+    if (!vg_control_flag) return;
+
+    // Get error
+    int q0_error = q0_desired - vg_q0_pos;
+    int q1_error = q1_desired - vg_q1_pos;
+
+    // Accumulate integral error
+    g_q0_accum_error += q0_error;
+    g_q1_accum_error += q1_error;
+
+    // Compute signed PWM
+    int q0_pwm = int((K_P0 * q0_error) + (K_D0 * vg_q0_speed) + (K_I0 * g_q0_accum_error));
+    int q1_pwm = int((K_P1 * q1_error) + (K_D1 * vg_q1_speed) + (K_I1 * g_q1_accum_error));
+
+    // Send pwm to motors
+    control_motor(MOTOR0_EN, q0_pwm);
+    control_motor(MOTOR1_EN, q1_pwm);
+
+    // Reset control flag
+    vg_control_flag = false;
 }
