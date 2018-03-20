@@ -18,7 +18,7 @@
 // Implementation of the Controller
 // This file is the controller entry points
 //
-// Last edited: 2018-03-19
+// Last edited: 2018-03-20
 // Contributor: Muchen He
 
 #include "PinChangeInterrupt.h"
@@ -167,7 +167,7 @@ void setup() {
     g_desired_index = 0;
 
     // Stop motor movements
-    stopAll();
+    stop_all();
 
     // === === ===[ Set pin mode ]=== === ===
     // Encoder pins
@@ -231,7 +231,7 @@ void loop() {
                 vg_q1_pos = PITCH_HOME_OFFSET;
             }
         break;
-        case STATE_RUN:
+        case s_run:
             
             // Normal controller code
             apply_control();
@@ -343,7 +343,7 @@ inline void apply_control() {
  *
  * EXEC TIME: runs at setup time so who cares
  */
-inline void compute_vertices(float *x_in, float *y_in, int *x_out, int *y_out) {
+inline void compute_vertices(const float *x_in, const float *y_in, int *x_out, int *y_out) {
     for (unsigned int i = 0; i < N_VERTICES; i++) {
         x_out[i] = int(map(x_in[i], -1.0f, 1.0f, YAW_MIN, YAW_MAX));
         y_out[i] = int(map(y_in[i], -1.0f, 1.0f, PITCH_MIN, PITCH_MAX));

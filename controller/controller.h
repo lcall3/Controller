@@ -58,7 +58,7 @@
 // Prescalers can be 1, 8, 64, 256, 1024
 #define TIMER1_PRESCALER 64
 #define TIMER1_DESIRED_FREQ 1000
-#define TIMER1_MATCH_VALUE = F_CPU / TIMER1_PRESCALER / TIMER1_DESIRED_FREQ
+#define TIMER1_MATCH_VALUE F_CPU / TIMER1_PRESCALER / TIMER1_DESIRED_FREQ
 
 // [*]
 #ifdef USE_PWM_FLOOR
@@ -117,6 +117,6 @@ char g_halt;
 void control_motor(char, int);
 void stop_all();
 void apply_control();
-void compute_vertices(float *, float *, int *, int *);
+void compute_vertices(const float *, const float *, int *, int *);
 
 #endif
