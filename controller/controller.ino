@@ -31,13 +31,15 @@
 // Check if shape exist, if not create the default shape
 #ifndef SHAPE_H
 #define N_VERTICES 4
-const float vertices_x[N_VERTICES] = {
+const float _vx[N_VERTICES] = {
     -1, 1, 1, -1
 };
-const float vertices_y[N_VERTICES] = {
+const float _vy[N_VERTICES] = {
     -1, -1, 1, 1
 };
-const unsigned short time_vector[N_VERTICES] = {
+int g_vx[N_VERTICES] = {};
+int g_vy[N_VERTICES] = {};
+const unsigned short _time_vector[N_VERTICES] = {
     200, 200, 200, 200
 };
 #endif
@@ -62,7 +64,7 @@ ISR(TIMER1_COMPA_vect) {
     vg_control_flag = true;
 
     // Update counter
-    vg_counter++;
+    vg_time_vector_count++;
 }
 
 /* Encoder edge change interrupt service routines
@@ -138,20 +140,20 @@ inline void init_timer1() {
  */
 void setup() {
     // Reset and initialze values
-    vg_q0_encoderA   = 0;
-    vg_q0_encoderB   = 0;
-    vg_q1_encoderA   = 0;
-    vg_q1_encoderB   = 0;
-    vg_q0_delta_pos  = 0;
-    vg_q1_delta_pos  = 0;
-    vg_q0_speed      = 0;
-    vg_q1_speed      = 0;
-    vg_q0_pos        = 0;
-    vg_q1_pos        = 0;
-    g_q0_accum_error = 0;
-    g_q1_accum_error = 0;
-    vg_counter       = 0;
-    vg_control_flag  = 0;
+    vg_q0_encoderA       = 0;
+    vg_q0_encoderB       = 0;
+    vg_q1_encoderA       = 0;
+    vg_q1_encoderB       = 0;
+    vg_q0_delta_pos      = 0;
+    vg_q1_delta_pos      = 0;
+    vg_q0_speed          = 0;
+    vg_q1_speed          = 0;
+    vg_q0_pos            = 0;
+    vg_q1_pos            = 0;
+    g_q0_accum_error     = 0;
+    g_q1_accum_error     = 0;
+    vg_time_vector_count = 0;
+    vg_control_flag      = 0;
 
     #ifdef USE_SERIAL
     vg_output_serial = 0;
@@ -160,6 +162,9 @@ void setup() {
     // Initial state
     g_state = s_home_q0;
     g_halt = 0;
+
+    // Initial desired
+    g_desired_index = 0;
 
     // Stop motor movements
     stopAll();
@@ -192,6 +197,9 @@ void setup() {
     #ifdef USE_SERIAL
     Serial.begin(SERIAL_BAUD_RATE);
     #endif
+
+    // Compute the trajectory array
+    compute_vertices(_vx, _vy, g_vx, g_vy);
 }
 
 /* Main program loop
@@ -203,18 +211,24 @@ void loop() {
     switch(g_state) {
         case s_home_q0:
             // This state should move motor 0 until it is homed
-            controlMotor(MOTOR0_EN, MOTOR0_MIN_MOVE_PWM);
+            control_motor(MOTOR0_EN, MOTOR0_MIN_MOVE_PWM);
             if (digitalRead(HOMING0)) {
                 g_state = s_home_q1;
-                stopAll();
+                stop_all();
+
+                // Reset position
+                vg_q0_pos = YAW_HOME_OFFSET;
             }
         break;
         case s_home_q1:
             // This state should move motor 1 until it is homed
-            controlMotor(MOTOR1_EN, MOTOR1_MIN_MOVE_PWM);
+            control_motor(MOTOR1_EN, MOTOR1_MIN_MOVE_PWM);
             if (digitalRead(HOMING1)) {
                 g_state = s_run;
-                stopAll();
+                stop_all();
+
+                // Rest position
+                vg_q1_pos = PITCH_HOME_OFFSET;
             }
         break;
         case STATE_RUN:
@@ -274,7 +288,7 @@ void control_motor(char motor, int pwm) {
  *
  * EXEC TIME: 12us
  */
-void stop_all() {
+inline void stop_all() {
     analogWrite(MOTOR0_EN, 0);
     analogWrite(MOTOR1_EN, 0);
 }
@@ -283,9 +297,23 @@ void stop_all() {
  *
  * EXEC TIME: 190us
  */
-void apply_control() {
+inline void apply_control() {
     // Only control when control flag is set to true
     if (!vg_control_flag) return;
+
+    // Set desired position
+    q0_desired = g_vx[g_desired_index];
+    q1_desired = g_vy[g_desired_index];
+
+    // Update desire index based on time elapsed
+    if (vg_time_vector_count >= _time_vector[g_desired_index]) {
+        if (g_desired_index == N_VERTICES - 1) {
+            g_desired_index = 0;
+        } else {
+            g_desired_index++;
+        }
+        vg_time_vector_count = 0;
+    }
 
     // Get error
     int q0_error = q0_desired - vg_q0_pos;
@@ -305,4 +333,19 @@ void apply_control() {
 
     // Reset control flag
     vg_control_flag = false;
+}
+
+/* Given vertices on a normalized plane, compute the corresponding array in terms of pulses
+ * PARAM: *x_in: normalized x coordinates as float array
+ * PARAM: *y_in: normalized y coordinates as float array
+ * PARAM: *x_out: mapped x coordinates in pulses
+ * PARAM: *y_out: mapped y coordinates in pulses
+ *
+ * EXEC TIME: runs at setup time so who cares
+ */
+inline void compute_vertices(float *x_in, float *y_in, int *x_out, int *y_out) {
+    for (unsigned int i = 0; i < N_VERTICES; i++) {
+        x_out[i] = int(map(x_in[i], -1.0f, 1.0f, YAW_MIN, YAW_MAX));
+        y_out[i] = int(map(y_in[i], -1.0f, 1.0f, PITCH_MIN, PITCH_MAX));
+    }
 }

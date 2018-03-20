@@ -18,7 +18,7 @@
 // This is a header for the controller implementation
 // Parameters for the controller should be chanced in this file
 //
-// Last edited: 2018-03-19
+// Last edited: 2018-03-20
 // Contributor: Muchen He
 
 #ifndef controller_h
@@ -34,6 +34,16 @@
 #define K_P1 1.0f
 #define K_I1 0.0f
 #define K_D1 0.0f
+
+// [*] Range of motion in pulses
+#define YAW_MIN -100
+#define YAW_MAX 100
+#define PITCH_MIN -50
+#define PITCH_MAX 50
+
+// [*] Homing offsets: when motors touche homing switches, the position is reset to these values
+#define YAW_HOME_OFFSET -100
+#define PITCH_HOME_OFFSET -50
 
 // [*]
 #define USE_SERIAL
@@ -82,12 +92,15 @@ volatile int vg_q1_pos;
 int q0_desired;
 int q1_desired;
 
+// current desired index
+unsigned int g_desired_index;
+
 // Accumulated position error
 long g_q0_accum_error;
 long g_q1_accum_error;
 
 // Unsigned counter
-volatile unsigned long vg_counter;
+volatile unsigned long vg_time_vector_count;
 
 // ISR timed control flags
 #ifdef USE_SERIAL
@@ -104,5 +117,6 @@ char g_halt;
 void control_motor(char, int);
 void stop_all();
 void apply_control();
+void compute_vertices(float *, float *, int *, int *);
 
 #endif

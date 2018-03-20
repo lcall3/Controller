@@ -79,10 +79,26 @@ void testControlMotor() {
 volatile int control_flag = 1;
 volatile int fake_control_flag = 1;
 volatile long accum1, accum2;
+volatile int xs[2] = {400, -400};
+volatile int ys[2] = {234, -432};
+volatile int tv[2] = {3, 2};
+volatile int desired1 = 0, desired2 = 0;
+volatile int desiredi = 0;
+volatile int count = 0;
 void testApplyControl() {
     if (!control_flag) return;
-    int q0_error = 69 - pos;
-    int q1_error = 420 - pos2;
+    desired1 = xs[desiredi];
+    desired2 = ys[desiredi];
+    if (count >= tv[desiredi]) {
+        if (desiredi == 1) {
+            desiredi = 0;
+        } else {
+            desiredi++;
+        }
+        count = 0;
+    }
+    int q0_error = desired1 - pos;
+    int q1_error = desired2 - pos2;
     accum1 += q0_error;
     accum2 += q1_error;
     int q0_pwm = int((3.4f * q0_error) + (0.033f * pos_change2) + (0.6f * accum1));
@@ -94,6 +110,7 @@ void testApplyControl() {
     pwm = q1_pwm;
     testControlMotor();
     fake_control_flag = false;
+    count++;
 }
 
 // Run test helper function

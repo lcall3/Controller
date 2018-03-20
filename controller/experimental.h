@@ -18,8 +18,9 @@
 // Contains experimental values
 // Everything in this file is editable
 //
-// Last edited: 2018-03-16
+// Last edited: 2018-03-20
 // Contributor: Muchen He
 
+// [*] Minimum PWM to get the motor moving
 #define MOTOR0_MIN_MOVE_PWM 32
 #define MOTOR1_MIN_MOVE_PWM 30
