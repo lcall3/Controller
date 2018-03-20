@@ -27,11 +27,11 @@ void testSerial10Char() {
 }
 
 // TEST 5 ::: Timer ISR function
-long pos = 0;
-int pos_change = 300;
-int speed;
-boolean flag1, flag2;
-long counter;
+volatile long pos = 0;
+volatile int pos_change = 300;
+volatile int speed;
+volatile boolean flag1, flag2;
+volatile long counter;
 void testTimer1ISR() {
     pos       += pos_change;
     speed      = pos_change;
@@ -43,9 +43,9 @@ void testTimer1ISR() {
 }
 
 // TEST 6 ::: Timer ISR function for dual motors
-long pos2 = 0;
-int pos_change2 = -365;
-int speed2;
+volatile long pos2 = 0;
+volatile int pos_change2 = -365;
+volatile int speed2;
 void testTimer1ISR2() {
     pos       += pos_change;
     speed      = pos_change;
@@ -57,6 +57,43 @@ void testTimer1ISR2() {
     flag2 = true;
     counter = 0;
     counter++;
+}
+
+// Test 7 ::: control motor pwm
+volatile int motor = 0;
+volatile int pwm = -50;
+void testControlMotor() {
+    if (motor == 0) {
+        digitalWrite(3, pwm > 0);
+        pwm = constrain(abs(pwm), 30, 255);
+        analogWrite(5, pwm);
+        
+    } else if (motor == 1) {
+        digitalWrite(4, pwm > 0);
+        pwm = constrain(abs(pwm), 30, 255);
+        analogWrite(6, pwm);
+    }
+}
+
+// Apply PID control for two motors
+volatile int control_flag = 1;
+volatile int fake_control_flag = 1;
+volatile long accum1, accum2;
+void testApplyControl() {
+    if (!control_flag) return;
+    int q0_error = 69 - pos;
+    int q1_error = 420 - pos2;
+    accum1 += q0_error;
+    accum2 += q1_error;
+    int q0_pwm = int((3.4f * q0_error) + (0.033f * pos_change2) + (0.6f * accum1));
+    int q1_pwm = int((8.9f * q1_error) + (0.001f * pos_change2) + (1.32f * accum2));
+    motor = 0;
+    pwm = q0_pwm;
+    testControlMotor();
+    motor = 1;
+    pwm = q1_pwm;
+    testControlMotor();
+    fake_control_flag = false;
 }
 
 // Run test helper function
@@ -93,6 +130,8 @@ void setup() {
     runFunction(&testSerial10Char, "Speed of serial print for 10 characters");
     runFunction(&testTimer1ISR, "Timer 1 ISR single motor");
     runFunction(&testTimer1ISR2, "Timer 1 ISR dual motor");
+    runFunction(&testControlMotor, "Control motor test");
+    runFunction(&testApplyControl, "Dual motor PID control test");
 }
 
 void loop() { }

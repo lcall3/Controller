@@ -18,7 +18,7 @@
 // Implementation of the Controller
 // This file is the controller entry points
 //
-// Last edited: 2018-03-16
+// Last edited: 2018-03-19
 // Contributor: Muchen He
 
 #include "PinChangeInterrupt.h"
@@ -26,6 +26,21 @@
 #include "controller.h"
 #include "lcall3.h"
 #include "experimental.h"
+#include "shape.h"
+
+// Check if shape exist, if not create the default shape
+#ifndef SHAPE_H
+#define N_VERTICES 4
+const float vertices_x[N_VERTICES] = {
+    -1, 1, 1, -1
+};
+const float vertices_y[N_VERTICES] = {
+    -1, -1, 1, 1
+};
+const unsigned short time_vector[N_VERTICES] = {
+    200, 200, 200, 200
+};
+#endif
 
 /* Timer 1 compare output ISR
  * Performs data acquisition and other controller flags
@@ -224,9 +239,9 @@ void loop() {
 /* Use analogWrite to control each of the motors
  *
  * PARAM motor: motor enable pins of the motor we want to control
- * PARAM pwm:   desired motor pwm to be sent
+ * PARAM pwm: desired motor pwm to be sent
  *
- * EXEC TIME:   
+ * EXEC TIME: 20us
  */
 void control_motor(char motor, int pwm) {
     if (motor == MOTOR0_EN) {
@@ -257,7 +272,7 @@ void control_motor(char motor, int pwm) {
 
 /* Use analogWrite to control each of the motors
  *
- * EXEC TIME:   12us
+ * EXEC TIME: 12us
  */
 void stop_all() {
     analogWrite(MOTOR0_EN, 0);
@@ -266,7 +281,7 @@ void stop_all() {
 
 /* Apply the PID control to both motors
  *
- * EXEC TIME: unknown
+ * EXEC TIME: 190us
  */
 void apply_control() {
     // Only control when control flag is set to true

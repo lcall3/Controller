@@ -18,7 +18,7 @@
 // This is a header for the controller implementation
 // Parameters for the controller should be chanced in this file
 //
-// Last edited: 2018-03-16
+// Last edited: 2018-03-19
 // Contributor: Muchen He
 
 #ifndef controller_h

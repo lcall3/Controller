@@ -17,7 +17,7 @@ DashedLines dash;
 int left, right, top, bottom;
 
 // Output to file
-final String shapeName = "newShape";
+final String shapeName = "shape";
 boolean useDouble = false;
 PrintWriter output;
 
