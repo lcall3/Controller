@@ -2,9 +2,11 @@
 // Socket client
 var socket;
 
+// Flags
 var isMobile = false;
 var toggleMobileEmit = false;
 var socketSetup = false;
+var drawLaser = true;
 
 // detect mobile rotation
 var angle_alpha = 0;
@@ -56,15 +58,41 @@ function draw() {
         }
         ellipse(0, 0, 100, 100);
     } else {
-        fill(255);
-        angleMode(DEGREES);
-        push();
-        rotateX(angle_beta - relative_beta);
-        rotateY(angle_alpha - relative_alpha);
-        rotateZ(angle_gamma - relative_gamma);
-        normalMaterial();
-        box(100);
-        pop();
+
+        if (drawLaser) {
+            // Draw grid
+            rectMode(CENTER);
+            noFill();
+            stroke(255);
+            rect(0, 0, 600, 600);
+            line(0, 300, 0, -300);
+            line(300, 0, -300, 0);
+            noStroke();
+
+            var k = -500;
+            var l = 0.5;
+
+            angleMode(DEGREES);
+            var a = (angle_alpha - relative_alpha) / l;
+            var b = (angle_beta - relative_beta) / l;
+
+            var x = k * tan(a);
+            var y = k * tan(b);
+            fill(255, 0, 0);
+            ellipse(x, y, 10, 10);
+            fill(250);
+            ellipse(x, y, 5, 5);
+        } else {
+            fill(255);
+            angleMode(DEGREES);
+            push();
+            rotateX(angle_beta - relative_beta);
+            rotateY(angle_alpha - relative_alpha);
+            rotateZ(angle_gamma - relative_gamma);
+            normalMaterial();
+            box(100);
+            pop();
+        }
     }
 }
 
