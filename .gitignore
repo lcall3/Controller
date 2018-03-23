@@ -66,3 +66,4 @@ dkms.conf
 *.nsx
 *.TxtPreview
 *.nsxPreview
+/sockets_control/node_modules

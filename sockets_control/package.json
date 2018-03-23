@@ -1,0 +1,20 @@
+{
+  "name": "sockets_control",
+  "version": "1.0.0",
+  "description": "ELEC 391 Local Server Laser Controller",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "controller",
+    "socket",
+    "server"
+  ],
+  "author": "Muchen He",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
