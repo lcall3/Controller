@@ -9,6 +9,9 @@ var toggleMobileEmit = false;
 var angle_alpha = 0;
 var angle_beta = 0;
 var angle_gamma = 0;
+var relative_alpha = 0;
+var relative_beta = 0;
+var relative_gamma = 0;
 
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight, WEBGL);
@@ -67,9 +70,9 @@ function draw() {
         fill(255);
         angleMode(DEGREES);
         push();
-        rotateX(angle_beta);
-        rotateY(angle_alpha);
-        rotateZ(angle_gamma);
+        rotateX(angle_beta - relative_beta);
+        rotateY(angle_alpha - relative_alpha);
+        rotateZ(angle_gamma - relative_gamma);
         normalMaterial();
         box(100);
         pop();
@@ -85,9 +88,11 @@ function touchEnded() {
 }
 
 function keyPressed() {
-    if (keyCode === SPACE) {
+    if (keyCode === 32) { // space bar
         // Recalibrate position
-        
+        relative_alpha = angle_alpha;
+        relative_beta = angle_beta;
+        relative_gamma = angle_gamma;
     }
 }
 
