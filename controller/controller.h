@@ -109,9 +109,8 @@ volatile char vg_output_serial;
 volatile char vg_control_flag;
 
 // Main state machine
-enum states {s_home_q0, s_home_q1, s_run, s_halt};
+enum states {s_idle, s_home_q0, s_home_q1, s_run};
 char g_state;
-char g_halt;
 
 // === === ===[ Function prototypes ]=== === ===
 void control_motor(char, int);

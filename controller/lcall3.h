@@ -40,8 +40,10 @@
 #define MOTOR1_DIREC A1
 
 // Homing pins
-#define HOMING0 A4
-#define HOMING1 A5
+#define HOMING0 A2
+#define HOMING1 A3
+
+// I2C line uses A4 and A5 (reserved)
 
 // Laser control
 #define LASER_CONTROL 11
@@ -53,12 +55,12 @@
 // Misc
 #define ONBOARD_LED 13
 
-// Aux
-#define AUX_D2 2
-#define AUX_D3 3
-#define AUX_A2 2
-#define AUX_A3 3
-#define AUX_A6 6
-#define AUX_A7 7
+// User interfacing
+#define BTN_A 2
+#define BTN_B 3
+
+// ADC available aux pins
+#define AUX_A6 A6
+#define AUX_A7 A7
 
 #endif

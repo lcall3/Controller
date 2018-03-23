@@ -185,6 +185,14 @@ void setup() {
     // Current driver output
     pinMode(MOTOR0_EN, OUTPUT);
     pinMode(MOTOR1_EN, OUTPUT);
+
+    // Homing pins
+    pinMode(HOMING0, INPUT_PULLUP);
+    pinMode(HOMING1, INPUT_PULLUP);
+
+    // Button pins
+    pinMode(BTN_A, INPUT_PULLUP);
+    pinMode(BTN_B, INPUT_PULLUP);
     // === === ===[ End of set pin mode ]=== === ===
 
     // Initialize timer 1
@@ -209,6 +217,15 @@ void setup() {
  */
 void loop() {
     switch(g_state) {
+        case s_idle:
+            // Show what the system is going to do
+            // won't move to another state unless asserted
+
+            // TODO: debounce circuit
+            if (digitalRead(BTN_A)) {
+                g_state = s_home_q0;
+            }
+        break;
         case s_home_q0:
             // This state should move motor 0 until it is homed
             control_motor(MOTOR0_EN, MOTOR0_MIN_MOVE_PWM);
@@ -235,17 +252,9 @@ void loop() {
             
             // Normal controller code
             apply_control();
-
-            // Stop state machine if halt flag is set to true
-            if (g_halt) {
-                g_state = s_halt;
-            }
-        break;
-        case s_halt:
-            g_state = s_halt;
         break;
         default:
-            g_state = s_halt;
+            g_state = s_idle;
         break;
     }
 }
@@ -253,7 +262,7 @@ void loop() {
 /* Use analogWrite to control each of the motors
  *
  * PARAM motor: motor enable pins of the motor we want to control
- * PARAM pwm: desired motor pwm to be sent
+ * PARAM pwm: desired motor signed pwm (-255 to 255) to be sent
  *
  * EXEC TIME: 20us
  */
