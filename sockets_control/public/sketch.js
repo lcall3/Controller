@@ -17,7 +17,7 @@ function setup() {
     canvas = createCanvas(windowWidth, windowHeight, WEBGL);
     canvas.position(0, 0);
 
-    socket = io.connect('http://192.168.0.101:8000');
+    socket = io.connect('http://206.12.43.52:8000');
 
     // Socket incoming message handling
     socket.on('rotateEvent', onRotateEvent);

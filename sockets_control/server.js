@@ -23,5 +23,6 @@ function onNewConnection(socket) {
 
     function onDeviceOrientationChange(data) {
         socket.broadcast.emit('rotateEvent', data);
+        console.log(data);
     }
 }
