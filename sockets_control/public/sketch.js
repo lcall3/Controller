@@ -20,7 +20,6 @@ function setup() {
     socket = io.connect('http://192.168.0.101:8000');
 
     // Socket incoming message handling
-    socket.on('mouseDraggedEvent', onMouseDraggedEvent);
     socket.on('rotateEvent', onRotateEvent);
 
     // graphics setup
@@ -33,22 +32,6 @@ function setupDeviceOrientation() {
         window.addEventListener('deviceorientation', onOrientationChange);
     }
     isMobile = true;
-}
-
-function mouseDragged() {
-    fill(50, 255, 50);
-    ellipse(mouseX, mouseY, 20, 20);
-    fill(255);
-    ellipse(mouseX, mouseY, 10, 10);
-
-    // Prepare payload to be sent
-    var data = {
-        x: mouseX,
-        y: mouseY
-    };
-
-    // Send load
-    socket.emit('mouseDragged', data);
 }
 
 // Shake to enable gyro emit
@@ -94,13 +77,6 @@ function keyPressed() {
         relative_beta = angle_beta;
         relative_gamma = angle_gamma;
     }
-}
-
-function onMouseDraggedEvent(data) {
-    fill(255, 50, 50);
-    ellipse(data.x, data.y, 20, 20);
-    fill(255);
-    ellipse(data.x, data.y, 10, 10);
 }
 
 function onOrientationChange(e) {
