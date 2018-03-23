@@ -4,6 +4,7 @@ var socket;
 
 var isMobile = false;
 var toggleMobileEmit = false;
+var socketSetup = false;
 
 // detect mobile rotation
 var angle_alpha = 0;
@@ -17,13 +18,18 @@ function setup() {
     canvas = createCanvas(windowWidth, windowHeight, WEBGL);
     canvas.position(0, 0);
 
-    socket = io.connect('http://206.12.43.52:8000');
+    // graphics setup
+    background(0);
+}
+
+function setupSocket(addr, port) {
+    var url = 'http://' + addr + ':' + port;
+    socket = io.connect(url);
+    console.log('Connecting to ' + url);
 
     // Socket incoming message handling
     socket.on('rotateEvent', onRotateEvent);
-
-    // graphics setup
-    background(0);
+    socketSetup = true;
 }
 
 function setupDeviceOrientation() {
@@ -80,7 +86,7 @@ function keyPressed() {
 }
 
 function onOrientationChange(e) {
-    if (toggleMobileEmit) {
+    if (toggleMobileEmit && socketSetup) {
         data = {
             alpha: e.alpha,
             beta: e.beta,
