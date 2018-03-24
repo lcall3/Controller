@@ -37,24 +37,44 @@ console.log("Hello world; the server is alive!");
 var socket = require('socket.io');
 var io = socket(server);
 
+// Current master
+var controlMaster = '';
+
 // Even handling
 io.sockets.on('connection', onNewConnection);
-io.sockets.on('disconnection', onDisconnection);
 
 function onNewConnection(socket) {
     console.log('new connection: ' + socket.id);
 
     // Bind events
-    socket.on('deviceOrientationChange', onDeviceOrientationChange);
+    socket.on('deviceOrientationChange', function(data) {
+        socket.broadcast.emit('deviceOrientationChanged', data);
+        console.log('device orientation updated');
+    });
 
-    function onDeviceOrientationChange(data) {
-        socket.broadcast.emit('rotateEvent', data);
-        console.log(data);
-    }
-}
+    socket.on('disconnect', function() {
+        console.log('disconnected: ' + socket.id);
 
-function onDisconnection(socket) {
-    console.log('disconnected: ' + socket.id);
+        if (controlMaster === socket.id) {
+            controlMaster = '';
+            console.log('no more control masters');
+        }
+    });
+
+    socket.on('requestToBeMaster', function() {
+        if (controlMaster === '') {
+
+            // Set as new master
+            controlMaster = socket.id;
+
+            // Emit the acknowledge signal back to client
+            socket.emit('requestToBeMasterResponse', true);
+
+            console.log('new master: ', socket.id);
+        }
+
+        // Otherwise don't response (deny)
+    });
 }
 
 // ====== set up serial port to talk to the arduino controller ======
