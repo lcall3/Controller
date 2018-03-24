@@ -68,6 +68,7 @@ function drawHostUI() {
 }
 
 // Socket functions
+// Setup socket, this function is called by the html js
 function setupSocket(addr, port) {
     var url = 'http://' + addr + ':' + port;
     socket = io.connect(url);
@@ -109,6 +110,9 @@ function keyPressed() {
             relative_alpha = angle_alpha;
             relative_beta = angle_beta;
             relative_gamma = angle_gamma;
+        } else if (keyCode === 67) {    // 'C'
+            console.log('Initializing serial...');
+            setupSerial();
         }
     }
 }
@@ -130,4 +134,42 @@ function touchStarted() {
 
 function touchEnded() {
     toggleMobileEmit = false;
+}
+
+// Serial interfacing
+var serial;
+function setupSerial() {
+    serial = new p5.SerialPort();
+
+    // Bind signals
+    serial.on('connected', function() {
+        console.log('Serial server active; awaiting devices');
+    });
+
+    serial.on('list', function(list) {
+        console.log('Available serial port list updated:');
+        for (var i = 0; i < list.length; i++) {
+            console.log(i + " " + list[i]);
+        }
+    });
+
+    serial.on('error', function(e) {
+        console.error(e);
+    })
+
+    serial.on('data', SerialEvent);
+}
+
+function SerialEvent(data) {
+    if (serial.available()) {
+        var c = serial.readChar();
+
+        if (c === '$') {
+            // Do something with special characters
+            return;
+        } else {
+            console.log(c);
+        }
+        // serial.clear();
+    }
 }
