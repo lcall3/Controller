@@ -5,9 +5,8 @@ function setup() {
 
     serial.on('connected', onServerConnected);
     serial.on('list', onListUpdate);
-    serial.on('data', onData);
     serial.on('error', onError);
-    serial.on('open', onOpen);
+    serial.on('data', SerialEvent)
 }
 
 function onServerConnected() {
@@ -19,16 +18,37 @@ function onListUpdate(list) {
 
     for (var i = 0; i < list.length; i++) {
         console.log(i + " " + list[i]);
-        html += '<button id="' + list[i] + '">' + list[i] + '</button>';
+        html += '<button class="port-btn" id="' + list[i] + '">' + list[i] + '</button>';
     }
 
-    $('#port-select').html(html);
+    if (rebindListButtons !== undefined) rebindListButtons();
 }
 
-function onData() {
-    while (serial.available()) {
-        console.log(serial.readStringUntil('\n'));
+function onPortSelect(port) {
+    serial.open(port, { baudRate: 115200 }, onOpen);
+
+    // close ui
+    if (startedSerial !== undefined) startedSerial();
+}
+
+function onSerialStop() {
+    // Close serial
+    serial.close();
+    console.log('Serial port closed');
+    if (endedSerial !== undefined) endedSerial();
+}
+
+function SerialEvent() {
+    if (serial.available()) {
+        var c = serial.readChar();
+
+        if (c === '$') {
+            return;
+        } else {
+            displayData(c);
+        }
     }
+    serial.clear();
 }
 
 function onError(err) {

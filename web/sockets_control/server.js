@@ -1,5 +1,7 @@
 // 'use strict';
 
+
+// ====== Get IP Address =======
 var os = require('os');
 var ifaces = os.networkInterfaces();
 
@@ -23,7 +25,7 @@ Object.keys(ifaces).forEach(function (ifname) {
     });
 });
 
-// Express
+// ====== Set up Express and socket to talk to phone ======
 var express = require('express');
 var app = express();
 var server = app.listen(8000);
@@ -38,7 +40,6 @@ var io = socket(server);
 // Even handling
 io.sockets.on('connection', onNewConnection);
 io.sockets.on('disconnection', onDisconnection);
-
 
 function onNewConnection(socket) {
     console.log('new connection: ' + socket.id);
@@ -55,3 +56,8 @@ function onNewConnection(socket) {
 function onDisconnection(socket) {
     console.log('disconnected: ' + socket.id);
 }
+
+// ====== set up serial port to talk to the arduino controller ======
+var serialserver = require('p5.serialserver');
+serialserver.start();
+console.log("p5.serialserver is running");
