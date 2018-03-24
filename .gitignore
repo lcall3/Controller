@@ -67,3 +67,7 @@ dkms.conf
 *.TxtPreview
 *.nsxPreview
 /sockets_control/node_modules
+/web/sockets_control/node_modules
+/web/sockets_control/package-lock.json
+/web/p5_serial/node_modules
+/web/p5_serial/package-lock.json
