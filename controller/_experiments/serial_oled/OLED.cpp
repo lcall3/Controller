@@ -146,7 +146,7 @@ void OLED::init() {
     sendCommand(0xB1);      // Set Phase Length
     sendCommand(0X51);      //
     sendCommand(0xB3);      // Set Display Clock Divide Ratio/Oscillator Frequency
-    sendCommand(0x01);
+    sendCommand(0xF1);
     sendCommand(0xB9);      //
     sendCommand(0xBC);      // set pre_charge voltage/VCOMH
     sendCommand(0x08);      // (0x08);
