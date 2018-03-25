@@ -1,6 +1,16 @@
 // Socket client
 var socket;
 
+// Hack for working around not immediately sending the command
+function socketEmit(cmd, data) {
+    if (data === undefined) {
+        socket.emit(cmd);
+    } else {
+        socket.emit(cmd, data)
+    }
+    socket.emit('nop');
+}
+
 // Flags
 var isMobile = false;
 var toggleMobileEmit = false;
@@ -25,9 +35,10 @@ function setup() {
     background(0);
 
     // Instantiate mobile UI components
-    btns.push(new Button(10, 20, 'Push', onSetVertex));
-    btns.push(new Button(10, 20 + 65, 'Pop', onRemoveVertex));
-    btns.push(new Button(10, 20 + 130, 'Go', onGo));
+    btns.push(new Button(10, 40, 'Push', onSetVertex));
+    btns.push(new Button(10, 40 + 65, 'Pop', onRemoveVertex));
+    btns.push(new Button(10, 40 + 130, 'Go', onGo));
+    btns.push(new Button(10, 40 + 195, 'Toggle Control', onToggleControl));
 }
 
 function draw() {
@@ -50,7 +61,7 @@ function drawMobileUI() {
     } else {
         fill(255);
     }
-    ellipse(width/2, height/2, 100, 100);
+    rect(0, height-20, width, height);
 
     // Buttons
     for (var i = 0, n = btns.length; i < n; i++) {
@@ -88,13 +99,16 @@ function drawHostUI() {
 
 // UI handler functions
 function onSetVertex() {
-
+    socketEmit('setVertex');
 }
 function onRemoveVertex() {
-
+    socketEmit('removeVertex');
 }
 function onGo() {
-
+    socketEmit('masterGo');
+}
+function onToggleControl() {
+    toggleMobileEmit = !toggleMobileEmit;
 }
 
 // Socket functions
@@ -128,7 +142,7 @@ function onOrientationChange(e) {
             beta: e.beta,
             gamma: e.gamma
         };
-        socket.emit('deviceOrientationChange', data);
+        socketEmit('deviceOrientationChange', data);
     }
 }
 
@@ -159,19 +173,13 @@ function deviceShaken() {
 }
 
 function touchStarted() {
+    // toggleMobileEmit = true;
     // Check that where we are pressing is inside the button or not
     for (var i = 0, n = btns.length; i < n; i++) {
         if (btns[i].isMouseInside(mouseX, mouseY)) {
-            return btns[i].callHandler();
+            btns[i].callHandler();
         }
     }
-
-    // If no button is found, just default to toggling control
-    toggleMobileEmit = true;
-}
-
-function touchEnded() {
-    toggleMobileEmit = false;
 }
 
 // Serial interfacing
@@ -225,24 +233,21 @@ class Button {
     }
 
     draw() {
+        rectMode(CORNER);
+        var btnColor;
         if (this.enabled) {
             if (this.isMouseInside(mouseX, mouseY) && mouseIsPressed) {
-                stroke(255, 0, 0);
-                noFill();
-                rect(this.x, this.y, this.width, this.height);
-                fill(255, 0, 0);
+                btnColor = color('#8F8');
             } else {
-                stroke(255);
-                noFill();
-                rect(this.x, this.y, this.width, this.height);
-                fill(255);
+                btnColor = color('#FFF');
             }
         } else {
-            stroke(150);
-            noFill();
-            rect(this.x, this.y, this.width, this.height);
-            fill(150);
+            btnColor = color('#444');
         }
+        stroke(btnColor);
+        noFill();
+        rect(this.x, this.y, this.width, this.height);
+        fill(btnColor);
         noStroke();
         textAlign(CENTER, CENTER);
         textSize(this.size);

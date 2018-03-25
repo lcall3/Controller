@@ -75,6 +75,17 @@ function onNewConnection(socket) {
 
         // Otherwise don't response (deny)
     });
+
+    // Mobile controller on vertex control handling
+    socket.on('setVertex', function() {
+        console.log('TODO: set vertex command received by server');
+    })
+    socket.on('removeVertex', function () {
+        console.log('TODO: remove vertex command received by server');
+    })
+    socket.on('masterGo', function () {
+        console.log('TODO: master go command received by server');
+    })
 }
 
 // ====== set up serial port to talk to the arduino controller ======
