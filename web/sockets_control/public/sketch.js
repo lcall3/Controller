@@ -27,6 +27,13 @@ var relative_gamma = 0;
 
 // Mobile UI components
 var btns = [];
+const btns_def_list = [
+    ['Push', onSetVertex],
+    ['Pop', onRemoveVertex],
+    ['Go', onGo],
+    ['Toggle Control', onToggleControl],
+    ['Origin', onZeroToOrigin]
+];
 
 // p5 functions
 function setup() {
@@ -34,11 +41,13 @@ function setup() {
     canvas.position(0, 0);
     background(0);
 
-    // Instantiate mobile UI components
-    btns.push(new Button(10, 40, 'Push', onSetVertex));
-    btns.push(new Button(10, 40 + 65, 'Pop', onRemoveVertex));
-    btns.push(new Button(10, 40 + 130, 'Go', onGo));
-    btns.push(new Button(10, 40 + 195, 'Toggle Control', onToggleControl));
+    var x_start = 10;
+    var y_start = 40;
+    var y_incre = 65;
+    for (var i = 0; i < btns_def_list.length; i++) {
+        var btn_def = btns_def_list[i];
+        btns.push(new Button(10, 40 + i * y_incre, btn_def[0], btn_def[1]));
+    }
 }
 
 function draw() {
@@ -46,7 +55,7 @@ function draw() {
     fill(255);
     textAlign(LEFT, BASELINE);
     textSize(10);
-    text('beta v0.3 Copyright 2018 (c) Muchen He', 20, 20);
+    text('beta v0.4 Copyright 2018 (c) Muchen He', 20, 20);
     if (isMobile) {
         drawMobileUI();
     } else {
@@ -95,6 +104,26 @@ function drawHostUI() {
     fill(250);
     ellipse(x, y, 5, 5);
     pop();
+
+    // Draw vertex UI
+
+    // Draw serial status UI
+    drawHostSerialStatusUI();
+}
+
+
+function drawHostSerialStatusUI() {
+    fill(connectedSerial !== '' ? '#8F8' : '#F88');
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    text(connectedSerial !== '' ? 'Serial connected to ' + connectedSerial : 'Serial offline', width / 2, 30);
+}
+
+function resetOrigin() {
+    relative_alpha = angle_alpha;
+    relative_beta = angle_beta;
+    relative_gamma = angle_gamma;
 }
 
 // UI handler functions
@@ -110,6 +139,9 @@ function onGo() {
 function onToggleControl() {
     toggleMobileEmit = !toggleMobileEmit;
 }
+function onZeroToOrigin() {
+    socketEmit('zeroToOrigin');
+}
 
 // Socket functions
 // Setup socket, this function is called by the html js
@@ -122,6 +154,10 @@ function setupSocket(addr, port) {
         angle_alpha = data.alpha;
         angle_beta = data.beta;
         angle_gamma = data.gamma;
+    });
+
+    socket.on('resetOrigin', function() {
+        resetOrigin();
     });
 }
 
@@ -150,9 +186,7 @@ function onOrientationChange(e) {
 function keyPressed() {
     if (!isMobile) {
         if (keyCode === 32) {   // space bar
-            // Resets the pointing position
-            relative_alpha = angle_alpha;
-            relative_beta = angle_beta;
+            resetOrigin();
             relative_gamma = angle_gamma;
         } else if (keyCode === 67) {    // 'C'
             console.log('Initializing serial...');
@@ -173,7 +207,6 @@ function deviceShaken() {
 }
 
 function touchStarted() {
-    // toggleMobileEmit = true;
     // Check that where we are pressing is inside the button or not
     for (var i = 0, n = btns.length; i < n; i++) {
         if (btns[i].isMouseInside(mouseX, mouseY)) {
@@ -184,6 +217,9 @@ function touchStarted() {
 
 // Serial interfacing
 var serial;
+
+var connectedSerial = '';
+
 function setupSerial() {
     serial = new p5.SerialPort();
 
@@ -225,7 +261,7 @@ class Button {
         this.x = x;
         this.y = y;
         this.name = name;
-        this.width = 60 + textWidth(this.name);
+        this.width = width - 2 * this.x;
         this.height = 60;
         this.enabled = true;
         this.handler = handler;

@@ -47,11 +47,6 @@ function onNewConnection(socket) {
     console.log('new connection: ' + socket.id);
 
     // Bind events
-    socket.on('deviceOrientationChange', function(data) {
-        socket.broadcast.emit('deviceOrientationChanged', data);
-        console.log('device orientation updated');
-    });
-
     socket.on('disconnect', function() {
         console.log('disconnected: ' + socket.id);
 
@@ -76,16 +71,24 @@ function onNewConnection(socket) {
         // Otherwise don't response (deny)
     });
 
-    // Mobile controller on vertex control handling
+    socket.on('deviceOrientationChange', function (data) {
+        socket.broadcast.emit('deviceOrientationChanged', data);
+        console.log('device orientation updated');
+    });
+
     socket.on('setVertex', function() {
         console.log('TODO: set vertex command received by server');
-    })
+    });
     socket.on('removeVertex', function () {
         console.log('TODO: remove vertex command received by server');
-    })
+    });
     socket.on('masterGo', function () {
         console.log('TODO: master go command received by server');
-    })
+    });
+
+    socket.on('zeroToOrigin', function() {
+        socket.broadcast.emit('resetOrigin');
+    });
 }
 
 // ====== set up serial port to talk to the arduino controller ======
