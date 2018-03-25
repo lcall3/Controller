@@ -241,14 +241,18 @@ void loop() {
             // This state should move motor 1 until it is homed
             control_motor(MOTOR1_EN, MOTOR1_MIN_MOVE_PWM);
             if (digitalRead(HOMING1)) {
-                g_state = s_run;
+                g_state = s_listen;
                 stop_all();
 
                 // Rest position
                 vg_q1_pos = PITCH_HOME_OFFSET;
             }
         break;
-        case s_run:
+        case s_listen:
+            // TODO: communication with host pc server happens here
+            g_state = s_draw;
+        break;
+        case s_draw:
             
             // Normal controller code
             apply_control();

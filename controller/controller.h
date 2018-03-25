@@ -18,7 +18,7 @@
 // This is a header for the controller implementation
 // Parameters for the controller should be chanced in this file
 //
-// Last edited: 2018-03-20
+// Last edited: 2018-03-25
 // Contributor: Muchen He
 
 #ifndef controller_h
@@ -109,7 +109,7 @@ volatile char vg_output_serial;
 volatile char vg_control_flag;
 
 // Main state machine
-enum states {s_idle, s_home_q0, s_home_q1, s_run};
+enum states {s_idle, s_home_q0, s_home_q1, s_listen, s_draw};
 char g_state;
 
 // === === ===[ Function prototypes ]=== === ===

@@ -73,3 +73,4 @@ dkms.conf
 /web/p5_serial/package-lock.json
 *.lck
 /model/Single Motor/slprj
+/.vscode
