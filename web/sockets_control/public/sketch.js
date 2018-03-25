@@ -14,21 +14,35 @@ var relative_alpha = 0;
 var relative_beta = 0;
 var relative_gamma = 0;
 
+
+// Mobile UI components
+var btns = [];
+
 // p5 functions
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight, P2D);
     canvas.position(0, 0);
     background(0);
+
+    // Instantiate mobile UI components
+    btns.push(new Button(10, 20, 'Push', onSetVertex));
+    btns.push(new Button(10, 20 + 65, 'Pop', onRemoveVertex));
+    btns.push(new Button(10, 20 + 130, 'Go', onGo));
 }
 
 function draw() {
     background(0);
+    fill(255);
+    textAlign(LEFT, BASELINE);
+    textSize(10);
+    text('beta v0.3 Copyright 2018 (c) Muchen He', 20, 20);
     if (isMobile) {
         drawMobileUI();
     } else {
         drawHostUI();
     }
 }
+
 
 function drawMobileUI() {
     if (toggleMobileEmit) {
@@ -37,6 +51,11 @@ function drawMobileUI() {
         fill(255);
     }
     ellipse(width/2, height/2, 100, 100);
+
+    // Buttons
+    for (var i = 0, n = btns.length; i < n; i++) {
+        btns[i].draw();
+    }
 }
 
 function drawHostUI() {
@@ -65,6 +84,17 @@ function drawHostUI() {
     fill(250);
     ellipse(x, y, 5, 5);
     pop();
+}
+
+// UI handler functions
+function onSetVertex() {
+
+}
+function onRemoveVertex() {
+
+}
+function onGo() {
+
 }
 
 // Socket functions
@@ -129,6 +159,14 @@ function deviceShaken() {
 }
 
 function touchStarted() {
+    // Check that where we are pressing is inside the button or not
+    for (var i = 0, n = btns.length; i < n; i++) {
+        if (btns[i].isMouseInside(mouseX, mouseY)) {
+            return btns[i].callHandler();
+        }
+    }
+
+    // If no button is found, just default to toggling control
     toggleMobileEmit = true;
 }
 
@@ -171,5 +209,72 @@ function SerialEvent(data) {
             console.log(c);
         }
         // serial.clear();
+    }
+}
+
+class Button {
+    constructor(x, y, name, handler) {
+        this.x = x;
+        this.y = y;
+        this.name = name;
+        this.width = 60 + textWidth(this.name);
+        this.height = 60;
+        this.enabled = true;
+        this.handler = handler;
+        this.size = 20;
+    }
+
+    draw() {
+        if (this.enabled) {
+            if (this.isMouseInside(mouseX, mouseY) && mouseIsPressed) {
+                stroke(255, 0, 0);
+                noFill();
+                rect(this.x, this.y, this.width, this.height);
+                fill(255, 0, 0);
+            } else {
+                stroke(255);
+                noFill();
+                rect(this.x, this.y, this.width, this.height);
+                fill(255);
+            }
+        } else {
+            stroke(150);
+            noFill();
+            rect(this.x, this.y, this.width, this.height);
+            fill(150);
+        }
+        noStroke();
+        textAlign(CENTER, CENTER);
+        textSize(this.size);
+        text(this.name, this.x + this.width / 2, this.y + this.height / 2);
+    }
+
+    callHandler() {
+        this.handler();
+    }
+
+    isMouseInside(x, y) {
+        if (x > this.x && y > this.y && x < this.x + this.width && y < this.y + this.height) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    setEnable(enable) {
+        this.enable = enable;
+    }
+
+    setXY(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    setWidth(w) {
+        this.width = w;
+    }
+
+    setHeight(h) {
+        this.height = h;
     }
 }
