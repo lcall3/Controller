@@ -65,7 +65,8 @@ function draw() {
     fill(255);
     textAlign(LEFT, BASELINE);
     textSize(10);
-    text('beta v0.5 Copyright 2018 (c) Muchen He', 20, 20);
+    text('lcall3 Controller beta v0.5', 20, 20);
+    text('Copyright 2018 (c) Muchen He', 20, 32);
     if (isMobile) {
         drawMobileUI();
     } else {
@@ -118,6 +119,10 @@ function drawHostUI() {
     ellipse(cursorX, cursorY, 10, 10);
     fill(250);
     ellipse(cursorX, cursorY, 5, 5);
+
+    // Draw saved vertices
+    drawVertices();
+
     pop();
 
     // Draw vertex UI
@@ -125,6 +130,24 @@ function drawHostUI() {
 
     // Draw serial status UI
     drawHostSerialStatusUI();
+}
+
+function drawVertices() {
+    noFill();
+    stroke('#0F0');
+    for (var i = 0; i < vertices.length; i++) {
+        var vec = normToScreen(vertices[i]);
+        var vecNext;
+        if (i == vertices.length - 1) {
+            vecNext = normToScreen(vertices[0]);
+        } else {
+            vecNext = normToScreen(vertices[i + 1]);
+        }
+
+        // Draw shape made by the vertex
+        line(vec.x, vec.y, vecNext.x, vecNext.y);
+        ellipse(vec.x, vec.y, 10, 10);
+    }
 }
 
 function drawVertexList() {
