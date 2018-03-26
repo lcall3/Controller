@@ -1,0 +1,77 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="ELEC 391 Controller">
+    <meta name="author" content="Muchen He">
+    <title>ELEC 391 Controller</title>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
+    
+    <script language="javascript" type="text/javascript" src="serial.js"></script>
+    <script language="javascript" type="text/javascript" src="sketch.js"></script>
+    
+    <script type="text/javascript">
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; }
+        html { overflow: hidden; }
+        canvas { position: absolute; }
+    </style>
+</head>
+<body>
+    <div class="init-container">
+        <h2 style="font-weight: 100">Select a port the controller is connected to: </h2>
+        <div id="port-select">
+        </div>
+    </div>
+    <div class="serial-control" hidden>
+        <button id="sc-stop">Stop</button>
+        <button id="sc-clear">Clear</button>
+    </div>
+    <div class="serial-data" hidden>
+    </div>
+<script>
+$(document).ready(function() {
+    $('#sc-stop').on('click', function(event) {
+        onSerialStop();
+    });
+
+    $('#sc-clear').on('click', function(event) {
+        $('.serial-data').html('');
+    });
+});
+
+function startedSerial() {
+    $('.init-container').hide();
+    $('.serial-control').show();
+    $('.serial-data').show();
+}
+
+function endedSerial() {
+    $('.init-container').show();
+    $('.serial-control').hide();
+    $('.serial-data').hide();
+}
+
+function rebindListButtons() {
+    $('#port-select').html(html);
+    $('.port-btn').on('click', function (event) {
+        onPortSelect($(event.target).html());
+    });
+}
+
+function displayData(msg) {
+    $('.serial-data').append(
+        '<p>' + msg + '</p>'
+    );
+}
+
+</script>
+</body>
+</html>
