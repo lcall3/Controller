@@ -35,6 +35,9 @@ const minTimeRatio = 0.2;
 const maxTimeRatio = 2.0;
 
 
+// Sound
+var sfx_connected;
+
 // Mobile UI components
 var btns = [];
 const btns_def_list = [
@@ -58,6 +61,10 @@ function setup() {
         var btn_def = btns_def_list[i];
         btns.push(new Button(10, 40 + i * y_incre, btn_def[0], btn_def[1]));
     }
+
+    // Sound
+    soundFormats('mp3', 'ogg');
+    sfx_connected = loadSound('assets/connect.ogg');
 }
 
 function draw() {
@@ -87,6 +94,10 @@ function drawMobileUI() {
     for (var i = 0, n = btns.length; i < n; i++) {
         btns[i].draw();
     }
+}
+
+function playTone() {
+    sfx_connected.play();
 }
 
 
@@ -155,7 +166,6 @@ function drawVertexList() {
     var y = 50;
     textSize(12);
     fill(255);
-    text('test', width/2, height/2);
     for (var i = 0; i < vertices.length; i++) {
         var vec = vertices[i];
         text(
@@ -264,6 +274,8 @@ function setupSocket(addr, port) {
     socket.on('popVertex', onPopVertex);
     socket.on('masterGo', onMasterGo);
     socket.on('resetOrigin', resetOrigin);
+
+    socket.on('newMaster', playTone);
 }
 
 // Mobile specific orientation event listener
@@ -301,8 +313,16 @@ function keyPressed() {
                 console.log('Serial port closed');
                 connectedSerial = '';
             }
+        } else if (keyCode === 8) { // backspace
+            onPopVertex();
         }
     }
+}
+
+function mouseClicked() {
+    cursorX = mouseX - width/2;
+    cursorY = mouseY - height/2;
+    onPushVertex();
 }
 
 // Mobile interfacing

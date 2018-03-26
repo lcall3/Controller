@@ -64,6 +64,7 @@ function onNewConnection(socket) {
 
             // Emit the acknowledge signal back to client
             socket.emit('requestToBeMasterResponse', true);
+            socket.broadcast.emit('newMaster');
 
             console.log('new master: ', socket.id);
         }
