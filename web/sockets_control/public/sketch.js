@@ -6,7 +6,7 @@ function socketEmit(cmd, data) {
     if (data === undefined) {
         socket.emit(cmd);
     } else {
-        socket.emit(cmd, data)
+        socket.emit(cmd, data);
     }
     socket.emit('nop');
 }
@@ -28,11 +28,11 @@ var relative_gamma = 0;
 // Mobile UI components
 var btns = [];
 const btns_def_list = [
-    ['Push', onSetVertex],
-    ['Pop', onRemoveVertex],
-    ['Go', onGo],
-    ['Toggle Control', onToggleControl],
-    ['Origin', onZeroToOrigin]
+    ['Push', setVertexEvent],
+    ['Pop', removeVertexEvent],
+    ['Go', masterGoEvent],
+    ['Toggle Control', toggleControlEvent],
+    ['Origin', zeroToOriginEvent]
 ];
 
 // p5 functions
@@ -55,7 +55,7 @@ function draw() {
     fill(255);
     textAlign(LEFT, BASELINE);
     textSize(10);
-    text('beta v0.4 Copyright 2018 (c) Muchen He', 20, 20);
+    text('beta v0.5 Copyright 2018 (c) Muchen He', 20, 20);
     if (isMobile) {
         drawMobileUI();
     } else {
@@ -78,31 +78,36 @@ function drawMobileUI() {
     }
 }
 
+
+var cursorX = 0;
+var cursorY = 0;
+var boundSize = 600;
 function drawHostUI() {
     rectMode(CENTER);
     noFill();
 
     push();
     translate(width/2, height/2);
-    stroke(255);
-    rect(0, 0, 600, 600);
-    line(0, 300, 0, -300);
-    line(300, 0, -300, 0);
+    stroke(100);
+    rect(0, 0, boundSize, boundSize);
+    line(0, boundSize/2, 0, -boundSize/2);
+    line(boundSize/2, 0, -boundSize/2, 0);
     noStroke();
 
-    var k = -500;
-    var l = 0.5;
-
     angleMode(DEGREES);
-    var a = (angle_alpha - relative_alpha) / l;
-    var b = (angle_beta - relative_beta) / l;
 
-    var x = k * tan(a);
-    var y = k * tan(b);
-    fill(255, 0, 0);
-    ellipse(x, y, 10, 10);
+    // Compute inverse kinematic
+    var d = 1000;
+    var a = -(angle_alpha - relative_alpha);
+    var b = -(angle_beta - relative_beta);
+    cursorX = d * tan(a);
+    cursorY = d * tan(b);
+
+    // Draw laser dot
+    fill('#0F0');
+    ellipse(cursorX, cursorY, 10, 10);
     fill(250);
-    ellipse(x, y, 5, 5);
+    ellipse(cursorX, cursorY, 5, 5);
     pop();
 
     // Draw vertex UI
@@ -126,21 +131,32 @@ function resetOrigin() {
     relative_gamma = angle_gamma;
 }
 
-// UI handler functions
-function onSetVertex() {
+// UI handler functions (sending from mobile)
+function setVertexEvent() {
     socketEmit('setVertex');
 }
-function onRemoveVertex() {
+function removeVertexEvent() {
     socketEmit('removeVertex');
 }
-function onGo() {
+function masterGoEvent() {
     socketEmit('masterGo');
 }
-function onToggleControl() {
+function toggleControlEvent() {
     toggleMobileEmit = !toggleMobileEmit;
 }
-function onZeroToOrigin() {
+function zeroToOriginEvent() {
     socketEmit('zeroToOrigin');
+}
+
+// Socket handler functions (receive from mobile -> server)
+function onPushVertex() {
+
+}
+function onPopVertex() {
+
+}
+function onMasterGo() {
+
 }
 
 // Socket functions
@@ -150,15 +166,17 @@ function setupSocket(addr, port) {
     socket = io.connect(url);
     console.log('Connecting to ' + url);
 
+    // Bind signals to slot
     socket.on('deviceOrientationChanged', function(data) {
         angle_alpha = data.alpha;
         angle_beta = data.beta;
         angle_gamma = data.gamma;
     });
 
-    socket.on('resetOrigin', function() {
-        resetOrigin();
-    });
+    socket.on('pushVertex', onPushVertex);
+    socket.on('popVertex', onPopVertex);
+    socket.on('masterGo', onMasterGo);
+    socket.on('resetOrigin', resetOrigin);
 }
 
 // Mobile specific orientation event listener
@@ -214,9 +232,11 @@ function deviceShaken() {
 
 function touchStarted() {
     // Check that where we are pressing is inside the button or not
-    for (var i = 0, n = btns.length; i < n; i++) {
-        if (btns[i].isMouseInside(mouseX, mouseY)) {
-            btns[i].callHandler();
+    if (isMobile) {
+        for (var i = 0, n = btns.length; i < n; i++) {
+            if (btns[i].isMouseInside(mouseX, mouseY)) {
+                btns[i].callHandler();
+            }
         }
     }
 }
@@ -235,8 +255,13 @@ function setupSerial() {
     });
 
     serial.on('list', function(list) {
-        console.log('Available serial port list updated:');
-        if (listSerialPorts !== undefined) listSerialPorts(list);
+        
+        if (list.length !== 0) {
+            console.log('Available serial port list updated:');
+            if (listSerialPorts !== undefined) listSerialPorts(list);
+        } else {
+            alert('No serial port available');
+        }
     });
 
     serial.on('error', function(e) {
@@ -264,7 +289,6 @@ function SerialEvent(data) {
         } else {
             console.log(c);
         }
-        // serial.clear();
     }
 }
 
