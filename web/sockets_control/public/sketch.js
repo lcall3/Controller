@@ -24,6 +24,16 @@ var relative_alpha = 0;
 var relative_beta = 0;
 var relative_gamma = 0;
 
+// Vertex array
+var vertices = [];
+var timeVector = [];
+
+// Physics enabled laser simulation variables
+/* TODO: */
+const timeFactor = 100;
+const minTimeRatio = 0.2;
+const maxTimeRatio = 2.0;
+
 
 // Mobile UI components
 var btns = [];
@@ -111,11 +121,27 @@ function drawHostUI() {
     pop();
 
     // Draw vertex UI
+    drawVertexList();
 
     // Draw serial status UI
     drawHostSerialStatusUI();
 }
 
+function drawVertexList() {
+    var x = 20;
+    var y = 50;
+    textSize(12);
+    fill(255);
+    text('test', width/2, height/2);
+    for (var i = 0; i < vertices.length; i++) {
+        var vec = vertices[i];
+        text(
+            '(' + vec.x + ', ' + vec.y + '):' + timeVector[i] + 'ms',
+            x,
+            y + i * 14
+        );
+    }
+}
 
 function drawHostSerialStatusUI() {
     fill(connectedSerial !== '' ? '#8F8' : '#F88');
@@ -151,12 +177,50 @@ function zeroToOriginEvent() {
 // Socket handler functions (receive from mobile -> server)
 function onPushVertex() {
 
+    // Add vertex
+    vertices.push(screenToNorm(createVector(cursorX, cursorY)));
+    var n = vertices.length;
+    console.log('Vertex added: ', vertices[n - 1].x, vertices[n - 1].y);
+
+    // Update time vector
+    if (n > 1) {
+        var normDistTo = vertices[n - 1].dist(vertices[n - 2]);
+        var timeTo = map(normDistTo, 0, 2, minTimeRatio * timeFactor, maxTimeRatio * timeFactor);
+        timeVector.push(timeTo);
+
+        // Update the time vector to starting index
+        normDistTo = vertices[n - 1].dist(vertices[0]);
+        timeTo = map(normDistTo, 0, 2, minTimeRatio * timeFactor, maxTimeRatio * timeFactor);
+        timeVector[0] = timeTo;
+    } else {
+        var timeTo = map(vertices[0].mag(), 0, 2, minTimeRatio * timeFactor, maxTimeRatio * timeFactor);
+        timeVector.push(timeTo);
+    }
 }
 function onPopVertex() {
-
+    var n = vertices.length;
+    if (n > 0) {
+        vertices.pop();
+        timeVector.pop();
+    }
 }
 function onMasterGo() {
+    alert('TODO:');
+}
 
+// Util functions
+function screenToNorm(screenVec) {
+    return createVector(
+        constrain(map(screenVec.x, -boundSize/2, boundSize/2, -1, 1), -1, 1),
+        constrain(map(screenVec.y, -boundSize/2, boundSize/2, -1, 1), -1, 1)
+    );
+}
+
+function normToScreen(normVec) {
+    return createVector(
+        map(normVec.x, -1, 1, -boundSize/2, boundSize/2),
+        map(normVec.y, -1, 1, -boundSize/2, boundSize/2)
+    );
 }
 
 // Socket functions
@@ -205,7 +269,6 @@ function keyPressed() {
     if (!isMobile) {
         if (keyCode === 32) {   // space bar
             resetOrigin();
-            relative_gamma = angle_gamma;
         } else if (keyCode === 67) {    // 'C'
             console.log('Initializing serial...');
             setupSerial();

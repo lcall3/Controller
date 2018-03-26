@@ -77,10 +77,10 @@ function onNewConnection(socket) {
     });
 
     socket.on('setVertex', function() {
-        console.log('TODO: set vertex command received by server');
+        socket.broadcast.emit('pushVertex');
     });
     socket.on('removeVertex', function () {
-        console.log('TODO: remove vertex command received by server');
+        socket.broadcast.emit('popVertex');
     });
     socket.on('masterGo', function () {
         console.log('TODO: master go command received by server');
