@@ -191,6 +191,12 @@ function keyPressed() {
         } else if (keyCode === 67) {    // 'C'
             console.log('Initializing serial...');
             setupSerial();
+        } else if (keyCode === 68) {    // 'D'
+            if (connectedSerial !== '') {
+                serial.close();
+                console.log('Serial port closed');
+                connectedSerial = '';
+            }
         }
     }
 }
@@ -230,9 +236,7 @@ function setupSerial() {
 
     serial.on('list', function(list) {
         console.log('Available serial port list updated:');
-        for (var i = 0; i < list.length; i++) {
-            console.log(i + " " + list[i]);
-        }
+        if (listSerialPorts !== undefined) listSerialPorts(list);
     });
 
     serial.on('error', function(e) {
@@ -240,6 +244,14 @@ function setupSerial() {
     })
 
     serial.on('data', SerialEvent);
+}
+
+function serialSelectPort(port) {
+    serial.open(port, { baudRate: 115200 }, function() {
+        console.log('Serial port opened at ' + port);
+    });
+    hideSerialPorts();
+    connectedSerial = port;
 }
 
 function SerialEvent(data) {
