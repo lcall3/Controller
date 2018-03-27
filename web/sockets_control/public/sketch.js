@@ -43,6 +43,7 @@ const PITCH_MAX = 50;
 
 // SCP
 const SCP = {
+    ARRAY_LENGTH: '#',
     START_ARRAY: '@',
     ARRAY_SEPARATE: ',',
     NEXT_ENTRY: '&',
@@ -251,8 +252,9 @@ function onPopVertex() {
         timeVector.pop();
     }
 }
-function onMasterGo() {
-    alert('TODO:');
+function onMasterProceed() {
+    sendVerticesToController();
+    alert(vertices.length + ' vertices sent to the controller');
 }
 
 // Util functions
@@ -293,7 +295,7 @@ function setupSocket(addr, port) {
 
     socket.on('pushVertex', onPushVertex);
     socket.on('popVertex', onPopVertex);
-    socket.on('masterGo', onMasterGo);
+    socket.on('masterProceed', onMasterProceed);
     socket.on('resetOrigin', resetOrigin);
 
     socket.on('newMaster', playTone);
@@ -335,9 +337,7 @@ function keyPressed() {
                 connectedSerial = '';
             }
         } else if (keyCode === 83) {  // 's': save vertices and go
-            if (connectedSerial !== '') {
-                sendVerticesToController();
-            }
+            sendVerticesToController();
         } else if (keyCode === 8) { // backspace
             onPopVertex();
         }
@@ -420,6 +420,16 @@ function SerialEvent(data) {
 }
 
 function sendVerticesToController() {
+    if (connectedSerial === '') return;
+
+    // Send size of array
+    sendChar(SCP.ARRAY_LENGTH);
+    var n = parseInt(vertices.length).toString();
+    for (var ni = 0; ni < n; ni++) {
+        sendChar(n[ni]);
+    }
+
+    // Start the array
     sendChar(SCP.START_ARRAY);
 
     // Arrays to send:
@@ -449,6 +459,7 @@ function sendVerticesToController() {
 
 function sendChar(c) {
     console.log(c);
+    serial.write(c);
 }
 
 class Button {

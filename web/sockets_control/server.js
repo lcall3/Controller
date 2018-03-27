@@ -84,7 +84,7 @@ function onNewConnection(socket) {
         socket.broadcast.emit('popVertex');
     });
     socket.on('masterGo', function () {
-        console.log('TODO: master go command received by server');
+        socket.broadcast.emit('masterProceed');
     });
 
     socket.on('zeroToOrigin', function() {
