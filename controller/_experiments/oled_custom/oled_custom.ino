@@ -10,13 +10,13 @@ void setup() {
     oled.clearDisplay();
     oled.setNormalDisplay();
     oled.setVerticalMode();
-
-    for (int i = 0; i < 12; i++) {
-        oled.setTextXY(i, 0);
-        oled.setGrayLevel(255);
-        oled.putString("Goodbye Sleep");
-    }
+    oled.setGrayLevel(255);
 }
 
+int i = 0;
 void loop() {
+    oled.setTextXY(i % 12, 0);
+    oled.putString("Bye sleep");
+    delay(400);
+    i++;
 }
