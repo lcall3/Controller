@@ -4,7 +4,7 @@ void setup() {
     Serial.begin(115200);
 }
 
-int inputByte;
+char inputByte;
 void loop() {
     if (Serial.available()) {
         inputByte = Serial.read();

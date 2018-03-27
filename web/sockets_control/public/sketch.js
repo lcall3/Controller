@@ -15,7 +15,7 @@ function socketEmit(cmd, data) {
 var isMobile = false;
 var toggleMobileEmit = false;
 var drawLaser = true;
-var mouseDrawEnabled = false;
+var mouseDrawEnabled = true;
 
 // detect mobile rotation
 var angle_alpha = 0;
@@ -35,6 +35,19 @@ const timeFactor = 100;
 const minTimeRatio = 0.2;
 const maxTimeRatio = 2.0;
 
+// Screen coords to pulse coords mapping constants
+const YAW_MIN = -100;
+const YAW_MAX = 100;
+const PITCH_MIN = -50;
+const PITCH_MAX = 50;
+
+// SCP
+const SCP = {
+    START_ARRAY: '@',
+    ARRAY_SEPARATE: ',',
+    NEXT_ENTRY: '&',
+    END_ARRAY: '!'
+};
 
 // Sound
 var sfx_connected;
@@ -220,15 +233,15 @@ function onPushVertex() {
     if (n > 1) {
         var normDistTo = vertices[n - 1].dist(vertices[n - 2]);
         var timeTo = map(normDistTo, 0, 2, minTimeRatio * timeFactor, maxTimeRatio * timeFactor);
-        timeVector.push(timeTo);
+        timeVector.push(parseInt(timeTo));
 
         // Update the time vector to starting index
         normDistTo = vertices[n - 1].dist(vertices[0]);
         timeTo = map(normDistTo, 0, 2, minTimeRatio * timeFactor, maxTimeRatio * timeFactor);
-        timeVector[0] = timeTo;
+        timeVector[0] = parseInt(timeTo);
     } else {
         var timeTo = map(vertices[0].mag(), 0, 2, minTimeRatio * timeFactor, maxTimeRatio * timeFactor);
-        timeVector.push(timeTo);
+        timeVector.push(parseInt(timeTo));
     }
 }
 function onPopVertex() {
@@ -254,6 +267,13 @@ function normToScreen(normVec) {
     return createVector(
         map(normVec.x, -1, 1, -boundSize/2, boundSize/2),
         map(normVec.y, -1, 1, -boundSize/2, boundSize/2)
+    );
+}
+
+function normToPulses(normVec) {
+    return createVector(
+        map(normVec.x, -1, 1, YAW_MIN, YAW_MAX),
+        map(normVec.y, -1, 1, PITCH_MIN, PITCH_MAX)
     );
 }
 
@@ -305,22 +325,21 @@ function keyPressed() {
     if (!isMobile) {
         if (keyCode === 32) {   // space bar
             resetOrigin();
-        } else if (keyCode === 67) {    // 'C'
+        } else if (keyCode === 67) {    // 'c': connect to serial
             console.log('Initializing serial...');
             setupSerial();
-        } else if (keyCode === 68) {    // 'D'
+        } else if (keyCode === 68) {    // 'd': disconnect from serial
             if (connectedSerial !== '') {
                 serial.close();
                 console.log('Serial port closed');
                 connectedSerial = '';
             }
+        } else if (keyCode === 83) {  // 's': save vertices and go
+            if (connectedSerial !== '') {
+                sendVerticesToController();
+            }
         } else if (keyCode === 8) { // backspace
             onPopVertex();
-        } else {
-            // FIXME: testing echo function
-            if (connectedSerial !== '') {
-                serial.write(keyCode);
-            }
         }
     }
 }
@@ -396,15 +415,40 @@ function serialSelectPort(port) {
 function SerialEvent(data) {
     if (serial.available()) {
         var c = serial.readChar();
-        console.log(c);
-
-        // if (c === '$') {
-        //     // Do something with special characters
-        //     return;
-        // } else {
-        //     console.log(c);
-        // }
+        console.log(connectedSerial + ': ' + c);
     }
+}
+
+function sendVerticesToController() {
+    sendChar(SCP.START_ARRAY);
+
+    // Arrays to send:
+    for (var i = 0; i < vertices.length; i++) {
+        var pulseVec = normToPulses(vertices[i]);
+        var timeTo = timeVector[i];
+        var x = parseInt(pulseVec.x).toString();
+        var y = parseInt(pulseVec.y).toString();
+        var t = timeTo.toString();
+
+        // Send x, y, and time vector, separated by ','
+        for (var xi = 0; xi < x.length; xi++) {
+            sendChar(x[xi]);
+        }
+        sendChar(SCP.ARRAY_SEPARATE);
+        for (var yi = 0; yi < y.length; yi++) {
+            sendChar(y[yi]);
+        }
+        sendChar(SCP.ARRAY_SEPARATE);
+        for (var ti = 0; ti < t.length; ti++) {
+            sendChar(t[ti]);
+        }
+        sendChar(SCP.NEXT_ENTRY);
+    }
+    sendChar(SCP.END_ARRAY);
+}
+
+function sendChar(c) {
+    console.log(c);
 }
 
 class Button {
