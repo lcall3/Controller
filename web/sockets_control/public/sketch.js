@@ -15,6 +15,7 @@ function socketEmit(cmd, data) {
 var isMobile = false;
 var toggleMobileEmit = false;
 var drawLaser = true;
+var mouseDrawEnabled = false;
 
 // detect mobile rotation
 var angle_alpha = 0;
@@ -315,14 +316,21 @@ function keyPressed() {
             }
         } else if (keyCode === 8) { // backspace
             onPopVertex();
+        } else {
+            // FIXME: testing echo function
+            if (connectedSerial !== '') {
+                serial.write(keyCode);
+            }
         }
     }
 }
 
 function mouseClicked() {
-    cursorX = mouseX - width/2;
-    cursorY = mouseY - height/2;
-    onPushVertex();
+    if (mouseDrawEnabled) {
+        cursorX = mouseX - width / 2;
+        cursorY = mouseY - height / 2;
+        onPushVertex();
+    }
 }
 
 // Mobile interfacing
@@ -371,7 +379,7 @@ function setupSerial() {
     });
 
     serial.on('error', function(e) {
-        console.error(e);
+        console.warn(e);
     })
 
     serial.on('data', SerialEvent);
@@ -388,13 +396,14 @@ function serialSelectPort(port) {
 function SerialEvent(data) {
     if (serial.available()) {
         var c = serial.readChar();
+        console.log(c);
 
-        if (c === '$') {
-            // Do something with special characters
-            return;
-        } else {
-            console.log(c);
-        }
+        // if (c === '$') {
+        //     // Do something with special characters
+        //     return;
+        // } else {
+        //     console.log(c);
+        // }
     }
 }
 
