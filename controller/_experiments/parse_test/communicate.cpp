@@ -24,6 +24,17 @@
 #include "communicate.h"
 #include <Arduino.h>
 
+void printData (int x_out[], int y_out[], unsigned int t_out[], int arrayLength) {
+    Serial.println();
+    for (int i = 0; i < arrayLength; i++) {
+        Serial.print(x_out[i]);
+        Serial.print(" ");
+        Serial.print(y_out[i]);
+        Serial.print(" ");
+        Serial.println(t_out[i]);
+    }
+}
+
 
 int parse_array ( int **x, int **y, unsigned int **t) {
 	// input byte from serial port
