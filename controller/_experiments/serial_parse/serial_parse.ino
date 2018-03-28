@@ -75,122 +75,6 @@ void setup() {
 
 // loop
 void loop() {
-<<<<<<< HEAD
-	if (Serial.available()) {
-		// read incoming serial and echo back
-		inputByte = Serial.read();
-   		Serial.write(inputByte);
-
-   		// check for special characters
-		switch (inputByte) {
-			// length of incoming array
-			case ARRAY_LENGTH:
-				readMode 	= 15;
-				arrayLength = 0;
-			break;
-
-			// start of array 
-			case START_ARRAY: 
-				readMode = 1;
-
-				// reset values
-				x 		= 0;
-				y 		= 0;
-				t 		= 0;
-				sign 	= 1;
-				// reset array index
-				index 	= 0;
-
-				// free any previously allocated memory
-				free(x_out);
-				free(y_out);
-				free(t_out);
-				
-				// allocate array memory
-				x_out = (int *) malloc (arrayLength * (sizeof(int)));
-				y_out = (int *) malloc (arrayLength * (sizeof(int)));
-				t_out = (int *) malloc (arrayLength * (sizeof(int)));
-
-			break;
-
-			// start of next value
-			case ARRAY_SEPARATE:
-				// multiply by +/- sign
-				if(readMode == 1)
-					x = x * sign;
-				else if (readMode == 2)
-					y = y * sign;
-
-		        // move to next value
-		        readMode++;
-
-		        // reset sign
-				sign = 1;
-
-			break;
-
-			// start of next array entry
-			case NEXT_ENTRY:
-				readMode = 1;
-
-				// store buffer values into array
-				x_out[index] = x;
-				y_out[index] = y;
-				t_out[index] = t * sign;
-
-				index++;
-
-				// reset buffer
-		        x 		= 0;
-		        y 		= 0;
-		        t 		= 0;
-        		sign 	= 1;
-
-			break;
-
-			// end of array 
-			case END_ARRAY:
-				// prints out array elements
-				printData(x_out, y_out, t_out, arrayLength);
-			break;
-
-			// case for any non-special characters
-			default: 
-						// check reading mode
-						switch (readMode) {
-							// read array length
-							case 15:
-								arrayLength = (arrayLength * 10) + (inputByte - '0');
-								break;
-
-							// read X
-							case 1 : 
-								if (inputByte == '-')
-									sign = -1;
-								else
-									x = (x * 10) + (inputByte - '0');
-								break;	
-
-							// read Y
-							case 2 : 
-								if (inputByte == '-')
-									sign = -1;
-								else
-									y = (y * 10) + (inputByte - '0');
-								break;
-
-							// read time
-							case 3 : 
-								if (inputByte == '-')
-									sign = -1;
-								else
-									t = (t * 10) + (inputByte - '0');
-								break;
-						}
-			break;
-		}		
-	}
-=======
     if (Serial.available()) {
         // read incoming serial and echo back
         inputByte = Serial.read();
@@ -300,6 +184,5 @@ void loop() {
         break;
         }
     }
->>>>>>> 013c9405148b280b7b65f6962a1abb8007dbd7c8
 }
 
