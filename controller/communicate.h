@@ -18,5 +18,26 @@
 // This is the header file that outlines all the functions that's required to
 // communicate with the host computer
 //
-// Last edited: 2018-03-23
+// Last edited: 2018-03-27
 // Contributor: Muchen He
+
+#ifndef communicate_h
+#define communicate_h
+
+// Defined special characters 
+#define START_ARRAY '@'
+#define ARRAY_SEPARATE ','
+#define NEXT_ENTRY '&'
+#define END_ARRAY '!'
+#define PARSE_ARRAY '#'
+
+extern int parse_array (int x[], int y[], int t[]);
+
+enum {
+    rm_length,
+    rm_x,
+    rm_y,
+    rm_time
+};
+
+#endif

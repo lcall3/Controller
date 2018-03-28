@@ -100,6 +100,10 @@ void loop() {
             // reset array index
             index = 0;
 
+            free(x_out);
+            free(y_out);
+            free(t_out); 
+            
             // allocate array memory
             x_out = (int *) malloc(arrayLength * (sizeof(int)));
             y_out = (int *) malloc(arrayLength * (sizeof(int)));
