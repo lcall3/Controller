@@ -24,7 +24,7 @@
 #include "communicate.h"
 #include <Arduino.h>
 
-extern int parse_array ( int x[], int y[], int t[]) {
+extern int parse_array ( int x[], int y[], unsigned int t[]) {
 	// input byte from serial port
 	char inputByte;
 
@@ -68,7 +68,7 @@ extern int parse_array ( int x[], int y[], int t[]) {
 		            // allocate array memory
 		            x = (int *) malloc(arrayLength * (sizeof(int)));
 		            y = (int *) malloc(arrayLength * (sizeof(int)));
-		            t = (int *) malloc(arrayLength * (sizeof(int)));
+		            t = (unsigned int *) malloc(arrayLength * (sizeof(unsigned int)));
 		        }
 
 		        // start of next value

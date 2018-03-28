@@ -31,7 +31,7 @@
 #define END_ARRAY '!'
 #define PARSE_ARRAY '#'
 
-extern int parse_array (int x[], int y[], int t[]);
+extern int parse_array (int x[], int y[], unsigned int t[]);
 
 enum {
     rm_length,

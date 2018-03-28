@@ -28,14 +28,9 @@
 #include "experimental.h"
 #include "communicate.h"
 
-// Check if shape exist, if not create the default shape
-// FIXME: we probably don't need the default shape
-// #define N_VERTICES 4
-// int g_vx[N_VERTICES] = {-50, 50, 50, -50};
-// int g_vy[N_VERTICES] = {-50, -50, 50, 50};
-// const unsigned short _time_vector[N_VERTICES] = {
-//     200, 200, 200, 200
-// };
+// FIXME: 
+// temp var
+unsigned int tempcounter = 0;
 
 // Shape array
 int *g_vertices_x;
@@ -266,6 +261,14 @@ void loop() {
             setup();
         break;
     }
+
+    if (tempcounter > 50000) {
+        tempcounter = 0;
+        Serial.write('#');
+        Serial.print(g_state, DEC);
+    }
+    tempcounter++;
+
 }
 
 /* Use analogWrite to control each of the motors
@@ -321,6 +324,7 @@ inline void apply_control() {
     
     // Check that vertices array is well-formed
     if (g_vertices_x == NULL || g_vertices_y == NULL || g_vertices_time == NULL || g_n_vertices <= 0) return;
+    Serial.print('B');
 
     // Update time vg_time_vector_count
     // Update desire index based on time elapsed
@@ -355,4 +359,5 @@ inline void apply_control() {
 
     // Reset control flag
     vg_control_flag = false;
+    Serial.print(g_desired_index, DEC);
 }
