@@ -1,3 +1,16 @@
+// lcall3 Controller is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// lcall3 Controller is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with lcall3 Controller. If not, see <http://www.gnu.org/licenses/>.
+
 // Socket client
 var socket;
 
@@ -29,11 +42,26 @@ var relative_gamma = 0;
 var vertices = [];
 var timeVector = [];
 
+// Screen canvas and laser preview
+var cursorX = 0;
+var cursorY = 0;
+var boundSize = 600;
+
 // Physics enabled laser simulation variables
 /* TODO: */
 const timeFactor = 100;
 const minTimeRatio = 0.2;
 const maxTimeRatio = 2.0;
+
+// Laser simulation preview
+var laserScreen;
+var position;
+var position_prev;
+var velocity;
+var accel;
+const accel_k = 0.15;
+const accel_lim = 0.09;
+const vel_decay = 0.4;
 
 // Screen coords to pulse coords mapping constants
 const YAW_MIN = -100;
@@ -69,6 +97,13 @@ function setup() {
     canvas = createCanvas(windowWidth, windowHeight, P2D);
     canvas.position(0, 0);
     background(0);
+
+    // Simulate preview setups
+    laserScreen   = createGraphics(boundSize, boundSize);
+    position      = createVector(0, 0);
+    position_prev = createVector(0, 0);
+    velocity      = createVector(0, 0);
+    accel         = createVector(0, 0);
 
     var x_start = 10;
     var y_start = 40;
@@ -117,16 +152,16 @@ function playTone() {
     sfx_connected.play();
 }
 
-
-var cursorX = 0;
-var cursorY = 0;
-var boundSize = 600;
 function drawHostUI() {
     rectMode(CENTER);
     noFill();
 
     push();
     translate(width/2, height/2);
+
+    // Draw tracer graphics
+    image(laserScreen, -boundSize/2, -boundSize/2);
+
     stroke(100);
     rect(0, 0, boundSize, boundSize);
     line(0, boundSize/2, 0, -boundSize/2);
@@ -158,6 +193,9 @@ function drawHostUI() {
 
     // Draw serial status UI
     drawHostSerialStatusUI();
+
+    // Update drawing of tracer
+    drawTracer();
 }
 
 function drawVertices() {
@@ -199,6 +237,51 @@ function drawHostSerialStatusUI() {
     textAlign(CENTER, CENTER);
     textSize(16);
     text(connectedSerial !== '' ? 'Serial connected to ' + connectedSerial : 'Serial offline', width / 2, 30);
+}
+
+var vertex_i = 0;
+var millis_prev = 0;
+function drawTracer() {
+    if (vertices.length < 1) return;
+
+    try {
+        var nowL = vertices[vertex_i];
+        var now = normToScreen(nowL);
+
+        // Update simulated kinematics
+        accel = nowL.copy().sub(position).mult(accel_k).limit(accel_lim);
+        velocity.mult(vel_decay);
+        velocity.add(accel);
+        position_prev = position.copy();
+        position.add(velocity);
+
+        // Draw laser
+        var posS = normToScreen(position);
+        var posSp = normToScreen(position_prev);
+        laserScreen.push();
+        laserScreen.scale(0.5); // HACK: for some reason it is doubled
+        laserScreen.fill(0, 30);
+        laserScreen.noStroke();
+        laserScreen.rect(0, 0, boundSize, boundSize);
+        laserScreen.translate(boundSize/2, boundSize/2);
+        laserScreen.stroke('#f00');
+        laserScreen.strokeWeight(8);
+        laserScreen.line(posS.x, posS.y, posSp.x, posSp.y);
+        laserScreen.stroke('#F88');
+        laserScreen.strokeWeight(3);
+        laserScreen.line(posS.x, posS.y, posSp.x, posSp.y);
+        laserScreen.pop();
+    } catch (e) {
+        console.warn(e);
+        vertex_i = 0;
+        return;
+    }
+
+    // Update index based on time
+    if ((millis() - millis_prev) > timeVector[vertex_i]) {
+        millis_prev = millis();
+        vertex_i = (vertex_i === vertices.length - 1) ? 0 : vertex_i + 1;
+    }
 }
 
 function resetOrigin() {
