@@ -52,6 +52,7 @@ const SCP = {
 
 // Sound
 var sfx_connected;
+var sfx_focus;
 
 // Mobile UI components
 var btns = [];
@@ -80,6 +81,7 @@ function setup() {
     // Sound
     soundFormats('mp3', 'ogg');
     sfx_connected = loadSound('assets/connect.ogg');
+    sfx_focus = loadSound('assets/focus.ogg');
 }
 
 function draw() {
@@ -244,6 +246,8 @@ function onPushVertex() {
         var timeTo = map(vertices[0].mag(), 0, 2, minTimeRatio * timeFactor, maxTimeRatio * timeFactor);
         timeVector.push(parseInt(timeTo));
     }
+
+    sfx_focus.play();
 }
 function onPopVertex() {
     var n = vertices.length;

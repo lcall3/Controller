@@ -26,19 +26,12 @@
 #include "controller.h"
 #include "lcall3.h"
 #include "experimental.h"
-#include "shape.h"
 
 // Check if shape exist, if not create the default shape
 #ifndef SHAPE_H
 #define N_VERTICES 4
-const float _vx[N_VERTICES] = {
-    -1, 1, 1, -1
-};
-const float _vy[N_VERTICES] = {
-    -1, -1, 1, 1
-};
-int g_vx[N_VERTICES] = {};
-int g_vy[N_VERTICES] = {};
+int g_vx[N_VERTICES] = {-50, 50, 50, -50};
+int g_vy[N_VERTICES] = {-50, -50, 50, 50};
 const unsigned short _time_vector[N_VERTICES] = {
     200, 200, 200, 200
 };
@@ -205,9 +198,6 @@ void setup() {
     #ifdef USE_SERIAL
     Serial.begin(SERIAL_BAUD_RATE);
     #endif
-
-    // Compute the trajectory array
-    compute_vertices(_vx, _vy, g_vx, g_vy);
 }
 
 /* Main program loop
@@ -346,19 +336,4 @@ inline void apply_control() {
 
     // Reset control flag
     vg_control_flag = false;
-}
-
-/* Given vertices on a normalized plane, compute the corresponding array in terms of pulses
- * PARAM: *x_in: normalized x coordinates as float array
- * PARAM: *y_in: normalized y coordinates as float array
- * PARAM: *x_out: mapped x coordinates in pulses
- * PARAM: *y_out: mapped y coordinates in pulses
- *
- * EXEC TIME: runs at setup time so who cares
- */
-inline void compute_vertices(const float *x_in, const float *y_in, int *x_out, int *y_out) {
-    for (unsigned int i = 0; i < N_VERTICES; i++) {
-        x_out[i] = int(map(x_in[i], -1.0f, 1.0f, YAW_MIN, YAW_MAX));
-        y_out[i] = int(map(y_in[i], -1.0f, 1.0f, PITCH_MIN, PITCH_MAX));
-    }
 }
