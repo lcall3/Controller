@@ -71,7 +71,7 @@ const PITCH_MAX = 50;
 
 // SCP
 const SCP = {
-    ARRAY_LENGTH: '#',
+    PARSE_ARRAY: '#',
     START_ARRAY: '@',
     ARRAY_SEPARATE: ',',
     NEXT_ENTRY: '&',
@@ -510,7 +510,7 @@ function sendVerticesToController() {
     if (connectedSerial === '') return;
 
     // Send size of array
-    sendChar(SCP.ARRAY_LENGTH);
+    sendChar(SCP.PARSE_ARRAY);
     var n = parseInt(vertices.length).toString();
     for (var ni = 0; ni < n; ni++) {
         sendChar(n[ni]);

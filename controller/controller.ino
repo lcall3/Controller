@@ -26,16 +26,22 @@
 #include "controller.h"
 #include "lcall3.h"
 #include "experimental.h"
+#include "communicate.h"
 
 // Check if shape exist, if not create the default shape
-#ifndef SHAPE_H
-#define N_VERTICES 4
-int g_vx[N_VERTICES] = {-50, 50, 50, -50};
-int g_vy[N_VERTICES] = {-50, -50, 50, 50};
-const unsigned short _time_vector[N_VERTICES] = {
-    200, 200, 200, 200
-};
-#endif
+// FIXME: we probably don't need the default shape
+// #define N_VERTICES 4
+// int g_vx[N_VERTICES] = {-50, 50, 50, -50};
+// int g_vy[N_VERTICES] = {-50, -50, 50, 50};
+// const unsigned short _time_vector[N_VERTICES] = {
+//     200, 200, 200, 200
+// };
+
+// Shape array
+int *g_vertices_x;
+int *g_vertices_y;
+unsigned int *g_vertices_time;
+unsigned int g_n_vertices;
 
 /* Timer 1 compare output ISR
  * Performs data acquisition and other controller flags
@@ -154,7 +160,6 @@ void setup() {
 
     // Initial state
     g_state = s_home_q0;
-    g_halt = 0;
 
     // Initial desired
     g_desired_index = 0;
@@ -208,13 +213,7 @@ void setup() {
 void loop() {
     switch(g_state) {
         case s_idle:
-            // Show what the system is going to do
-            // won't move to another state unless asserted
-
-            // TODO: debounce circuit
-            if (digitalRead(BTN_A)) {
-                g_state = s_home_q0;
-            }
+            g_state = s_home_q0;
         break;
         case s_home_q0:
             // This state should move motor 0 until it is homed
@@ -239,16 +238,32 @@ void loop() {
             }
         break;
         case s_listen:
-            // TODO: communication with host pc server happens here
-            g_state = s_draw;
+            if (Serial.available()) {
+                char in = Serial.read();
+
+                // TODO:
+                switch(in) {
+                    case PARSE_ARRAY:
+                        g_n_vertices = parse_array(g_vertices_x, g_vertices_y, g_vertices_time);
+
+                        if (g_n_vertices > 0) {
+
+                            // Array parsed correctly, go to draw
+                            g_state = s_draw;
+                        };
+                    break;
+                }
+            }
+
         break;
         case s_draw:
-            
+
             // Normal controller code
             apply_control();
         break;
         default:
-            g_state = s_idle;
+            // Should never be here, reset if needed
+            setup();
         break;
     }
 }
@@ -303,20 +318,24 @@ inline void stop_all() {
 inline void apply_control() {
     // Only control when control flag is set to true
     if (!vg_control_flag) return;
+    
+    // Check that vertices array is well-formed
+    if (g_vertices_x == NULL || g_vertices_y == NULL || g_vertices_time == NULL || g_n_vertices <= 0) return;
 
-    // Set desired position
-    q0_desired = g_vx[g_desired_index];
-    q1_desired = g_vy[g_desired_index];
-
+    // Update time vg_time_vector_count
     // Update desire index based on time elapsed
-    if (vg_time_vector_count >= _time_vector[g_desired_index]) {
-        if (g_desired_index == N_VERTICES - 1) {
+    if (vg_time_vector_count >= g_vertices_time[g_desired_index]) {
+        if (g_desired_index == g_n_vertices - 1) {
             g_desired_index = 0;
         } else {
             g_desired_index++;
         }
         vg_time_vector_count = 0;
     }
+
+    // Get desired position
+    q0_desired = g_vertices_x[g_desired_index];
+    q1_desired = g_vertices_y[g_desired_index];
 
     // Get error
     int q0_error = q0_desired - vg_q0_pos;
