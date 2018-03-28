@@ -166,7 +166,6 @@ function drawHostUI() {
     rect(0, 0, boundSize, boundSize);
     line(0, boundSize/2, 0, -boundSize/2);
     line(boundSize/2, 0, -boundSize/2, 0);
-    noStroke();
 
     angleMode(DEGREES);
 
@@ -178,10 +177,9 @@ function drawHostUI() {
     cursorY = d * tan(b);
 
     // Draw laser dot
-    fill('#0F0');
-    ellipse(cursorX, cursorY, 10, 10);
-    fill(250);
-    ellipse(cursorX, cursorY, 5, 5);
+    stroke(255);
+    line(cursorX - 10, cursorY, cursorX + 10, cursorY);
+    line(cursorX, cursorY - 10, cursorX, cursorY + 10);
 
     // Draw saved vertices
     drawVertices();
@@ -200,7 +198,7 @@ function drawHostUI() {
 
 function drawVertices() {
     noFill();
-    stroke('#0F0');
+    stroke(150);
     for (var i = 0; i < vertices.length; i++) {
         var vec = normToScreen(vertices[i]);
         var vecNext;
@@ -260,7 +258,7 @@ function drawTracer() {
         var posSp = normToScreen(position_prev);
         laserScreen.push();
         laserScreen.scale(0.5); // HACK: for some reason it is doubled
-        laserScreen.fill(0, 30);
+        laserScreen.fill(0,80);
         laserScreen.noStroke();
         laserScreen.rect(0, 0, boundSize, boundSize);
         laserScreen.translate(boundSize/2, boundSize/2);

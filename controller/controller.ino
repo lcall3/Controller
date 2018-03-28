@@ -18,7 +18,7 @@
 // Implementation of the Controller
 // This file is the controller entry points
 //
-// Last edited: 2018-03-20
+// Last edited: 2018-03-27
 // Contributor: Muchen He
 
 #include "PinChangeInterrupt.h"
@@ -27,10 +27,6 @@
 #include "lcall3.h"
 #include "experimental.h"
 #include "communicate.h"
-
-// FIXME: 
-// temp var
-unsigned int tempcounter = 0;
 
 // Shape array
 int *g_vertices_x;
@@ -235,12 +231,9 @@ void loop() {
         case s_listen:
             if (Serial.available()) {
                 char in = Serial.read();
-
-                // TODO:
                 switch(in) {
                     case PARSE_ARRAY:
-                        g_n_vertices = parse_array(g_vertices_x, g_vertices_y, g_vertices_time);
-
+                        g_n_vertices = parse_array(&g_vertices_x, &g_vertices_y, &g_vertices_time);
                         if (g_n_vertices > 0) {
 
                             // Array parsed correctly, go to draw
@@ -261,14 +254,6 @@ void loop() {
             setup();
         break;
     }
-
-    if (tempcounter > 50000) {
-        tempcounter = 0;
-        Serial.write('#');
-        Serial.print(g_state, DEC);
-    }
-    tempcounter++;
-
 }
 
 /* Use analogWrite to control each of the motors
@@ -324,7 +309,6 @@ inline void apply_control() {
     
     // Check that vertices array is well-formed
     if (g_vertices_x == NULL || g_vertices_y == NULL || g_vertices_time == NULL || g_n_vertices <= 0) return;
-    Serial.print('B');
 
     // Update time vg_time_vector_count
     // Update desire index based on time elapsed
@@ -359,5 +343,4 @@ inline void apply_control() {
 
     // Reset control flag
     vg_control_flag = false;
-    Serial.print(g_desired_index, DEC);
 }
