@@ -24,135 +24,135 @@
 #include "communicate.h"
 #include <Arduino.h>
 
-extern int parse_array ( int x[], int y[], unsigned int t[]) {
-	// input byte from serial port
-	char inputByte;
 
-	// value buffers
-	int sign;
-	int bufferX, bufferY, bufferT;
+int parse_array ( int **x, int **y, unsigned int **t) {
+    // input byte from serial port
+    char inputByte;
 
-	// output array 
-	int arrayLength = 0;
-	int index = 0;
+    // value buffers
+    int sign = 1;
+    int bufferX, bufferY, bufferT;
 
-	// reading mode
-	unsigned char readMode = rm_length;
+    // output array 
+    int arrayLength = 0;
+    int index = 0;
 
-	while(1) {
+    // reading mode
+    unsigned char readMode = rm_length;
 
-		    if (Serial.available()) {
-		        // read incoming serial and echo back
-		        inputByte = Serial.read();
-		        Serial.write(inputByte);
+    while (1) {
+        if (Serial.available()) {
+            // read incoming serial and echo back
+            inputByte = Serial.read();
+            Serial.write(inputByte);
 
-	        	/* check for special characters */
+            /* check for special characters */
 
-		        // start of array 
-		        if (inputByte == START_ARRAY) {
-		            readMode = rm_x;
+            // start of array 
+            if (inputByte == START_ARRAY) {
+                readMode = rm_x;
 
-		            // reset values
-		            bufferX    	= 0;
-		            bufferY    	= 0;
-		            bufferT    	= 0;
-		            sign 		= 1;
-		            // reset array index
-		            index 		= 0;
+                // reset values
+                bufferX = 0;
+                bufferY = 0;
+                bufferT = 0;
+                sign    = 1;
+                // reset array index
+                index   = 0;
 
-		            // free array memory
-		            free(x);
-		            free(y);
-		            free(t);
+                // free array memory
+                free(*x);
+                free(*y);
+                free(*t);
 
-		            // allocate array memory
-		            x = (int *) malloc(arrayLength * (sizeof(int)));
-		            y = (int *) malloc(arrayLength * (sizeof(int)));
-		            t = (unsigned int *) malloc(arrayLength * (sizeof(unsigned int)));
-		        }
+                // allocate array memory
+                *x = (int *) malloc(arrayLength * (sizeof(int)));
+                *y = (int *) malloc(arrayLength * (sizeof(int)));
+                *t = (unsigned int *) malloc(arrayLength * (sizeof(unsigned int)));
+            }
 
-		        // start of next value
-		        else if (inputByte == ARRAY_SEPARATE) {
-		            // multiply by +/- sign
-		            // and move to next value
-		            if (readMode == rm_x) {
-		                bufferX  = bufferX * sign;
-		                readMode = rm_y;
-		            }
-		            else if (readMode == rm_y) {
-		                bufferY  = bufferY * sign;
-		                readMode = rm_time;
-		            }
+            // start of next value
+            else if (inputByte == ARRAY_SEPARATE) {
+                // multiply by +/- sign
+                // and move to next value
+                if (readMode == rm_x) {
+                    bufferX  = bufferX * sign;
+                    readMode = rm_y;
+                }
+                else if (readMode == rm_y) {
+                    bufferY  = bufferY * sign;
+                    readMode = rm_time;
+                }
 
-		            // reset sign
-		            sign = 1;
-		        }
+                // reset sign
+                sign = 1;
+            }
 
-		        // start of next array entry
-		        else if (inputByte == NEXT_ENTRY) {
-		            readMode = rm_x;
+            // start of next array entry
+            else if (inputByte == NEXT_ENTRY) {
+                readMode = rm_x;
 
-		            // store buffer values into array
-		            x[index] = bufferX;
-		            y[index] = bufferY;
-		            t[index] = bufferT * sign;
+                // store buffer values into array
+                *(*x + index) = bufferX;
+                *(*y + index) = bufferY;
+                *(*t + index) = bufferT * sign;
 
-		            index++;
+                index++;
 
-		            // reset buffer
-		            bufferX    	= 0;
-		            bufferY    	= 0;
-		            bufferT    	= 0;
-		            sign 		= 1;
-		        }
+                // reset buffer
+                bufferX = 0;
+                bufferY = 0;
+                bufferT = 0;
+                sign    = 1;
+            }
 
-		        // end of array 
-		        else if (inputByte == END_ARRAY) {
-		        	return arrayLength;
-		        }
+            // end of array 
+            else if (inputByte == END_ARRAY) {
+                return arrayLength;
+            }
 
-		        /* read incoming data */
+            /* read incoming data */
 
-		        else if (inputByte == '-' || (inputByte >= '0' && inputByte <= '9')) {  
-		            // check reading mode
-		            switch (readMode) {
-		                // read array length
-			            case rm_length:
-			                arrayLength = (arrayLength * 10) + (inputByte - '0');
-			            break;
+            else if (inputByte == '-' || (inputByte >= '0' && inputByte <= '9')) {  
+                // check reading mode
+                switch (readMode) {
+                    // read array length
+                    case rm_length:
+                        arrayLength = (arrayLength * 10) + (inputByte - '0');
+                    break;
 
-			            // read bufferX
-			            case rm_x:
-			                if (inputByte == '-')
-			                    sign = -1;
-			                else
-			                    bufferX = (bufferX * 10) + (inputByte - '0');
-			            break;
+                    // read bufferX
+                    case rm_x:
+                        if (inputByte == '-')
+                            sign = -1;
+                        else
+                            bufferX = (bufferX * 10) + (inputByte - '0');
+                    break;
 
-			            // read Y
-			            case rm_y:
-			                if (inputByte == '-')
-			                    sign = -1;
-			                else
-			                    bufferY = (bufferY * 10) + (inputByte - '0');
-			            break;
+                    // read Y
+                    case rm_y:
+                        if (inputByte == '-')
+                            sign = -1;
+                        else
+                            bufferY = (bufferY * 10) + (inputByte - '0');
+                    break;
 
-			            // read time
-			            case rm_time:
-			                if (inputByte == '-')
-			                    sign = -1;
-			                else
-			                    bufferT = (bufferT * 10) + (inputByte - '0');
-			            break;
-		            }
-		        }
+                    // read time
+                    case rm_time:
+                        if (inputByte == '-')
+                            sign = -1;
+                        else
+                            bufferT = (bufferT * 10) + (inputByte - '0');
+                    break;
+                }
+            }
 
-		        /* invalid character */
-		        else {
-		        	return 0;
-		        }
-	        
-	    }
-	}
+            /* invalid character */
+            else {
+                return 0;
+            }
+        
+        }
+    }
 }
 

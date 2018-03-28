@@ -32,6 +32,7 @@
 #define PARSE_ARRAY '#'
 
 int parse_array (int **x, int **y, unsigned int **t);
+void printData (int x_out[], int y_out[], unsigned int t_out[], int arrayLength);
 
 enum {
     rm_length,
