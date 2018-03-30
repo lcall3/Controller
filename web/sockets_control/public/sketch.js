@@ -124,7 +124,7 @@ function draw() {
     fill(255);
     textAlign(LEFT, BASELINE);
     textSize(10);
-    text('lcall3 Controller beta v0.5', 20, 20);
+    text('lcall3 Controller beta v0.6', 20, 20);
     text('Copyright 2018 (c) Muchen He', 20, 32);
     if (isMobile) {
         drawMobileUI();
