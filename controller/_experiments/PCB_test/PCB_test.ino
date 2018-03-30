@@ -20,7 +20,7 @@
 // PID Limiter
 #ifdef LIMIT_PWM
 #define K_MIN 38    // [*]
-#define K_MAX 80    // [*]
+#define K_MAX 255    // [*]
 #endif
 
 // Square step response
@@ -31,7 +31,7 @@ int cycle_time;
 #endif
 
 // PID Values
-#define P_GAIN 1.7f    // [*]
+#define P_GAIN 10.7f    // [*]
 #define D_GAIN -48.0f    // [*]
 #define I_GAIN 0.000f      // [*]
 
@@ -196,22 +196,23 @@ void setup() {
 }
 
 void loop() {
+//
+//    // INIT STATE
+//    if (state == 0) {
+//        q0_pwm = INIT_PWM;
+//        digitalWrite(Q0_DIR_A, 1);
+//        digitalWrite(Q0_DIR_B, 0);
+//        // Send PWM output
+//        analogWrite(Q0_EN_PIN, q0_pwm);
+//        while (digitalRead(Q0_HOME) == HIGH);
+//        // Set to OPERATING STATE
+//        state = 1;
+//        q0_position = 88;
+//        Serial.println("Start");
+//    }
 
-    // INIT STATE
-    if (state == 0) {
-        q0_pwm = INIT_PWM;
-        digitalWrite(Q0_DIR_A, 1);
-        digitalWrite(Q0_DIR_B, 0);
-        // Send PWM output
-        analogWrite(Q0_EN_PIN, q0_pwm);
-        while (digitalRead(Q0_HOME) == HIGH);
-        // Set to OPERATING STATE
-        state = 1;
-        q0_position = 88;
-    }
-
-    // OPERATING STATE
-    else {
+//    // OPERATING STATE
+//    else {
       // Compute control PWM
       if (control_flag) {
           control_flag = false;
@@ -264,5 +265,5 @@ void loop() {
           toggle_unit_square = false;
       }
       #endif
-    }
+//    }
 }
