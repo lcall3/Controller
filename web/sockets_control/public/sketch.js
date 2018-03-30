@@ -510,7 +510,7 @@ function sendVerticesToController() {
     // Send size of array
     sendChar(SCP.PARSE_ARRAY);
     var n = parseInt(vertices.length).toString();
-    for (var ni = 0; ni < n; ni++) {
+    for (var ni = 0; ni < n.length; ni++) {
         sendChar(n[ni]);
     }
 

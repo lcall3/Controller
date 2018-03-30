@@ -90,8 +90,53 @@ class Cereal {
     }
 
     // Sends serialized data to controller
-    sendVerticesToController(vertices, timeVector) {
+    sendVerticesToController(vertices, timeVector, space) {
 
-        // 
+        // Check that the input is correct
+        if (vertices.length != timeVector.length) {
+            console.error('Ill-formed vertex/time vector');
+            return;
+        }
+
+        // Send character to commence the array sequence
+        this.sendChar(SCP.PARSE_ARRAY);
+
+        // Send the length of the array
+        var n = vertices.length;
+        var ns = parseInt(n).toString();
+        for (var i = 0; i < ns.length; i++) {
+            this.sendChar(ns[i]);
+        }
+
+        // Send character to start the entries in the array
+        this.sendChar(SCP.START_ARRAY);
+
+        // Send array elements
+        for (var j = 0; j < n; j++) {
+
+            // Get string form
+            var pulseVec = space.normToLaser(vertices[i]);
+            var timeTo = timeVector[i];
+            var x = parseInt(pulseVec.x).toString();
+            var y = parseInt(pulseVec.y).toString();
+            var t = timeTo.toString();
+
+            // Send x, y, and time separated by separator
+            for (var xi = 0; xi < x.length; xi++) {
+                this.sendChar(x[xi]);
+            }
+            this.sendChar(SCP.ARRAY_SEPARATE);
+            for (var yi = 0; yi < y.length; yi++) {
+                this.sendChar(y[yi]);
+            }
+            this.sendChar(SCP.ARRAY_SEPARATE);
+            for (var ti = 0; ti < t.length; ti++) {
+                this.sendChar(t[ti]);
+            }
+            this.sendChar(SCP.NEXT_ENTRY);
+        }
+
+        // End array character
+        this.sendChar(SCP.END_ARRAY);
     }
 }
