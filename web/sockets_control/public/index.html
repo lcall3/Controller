@@ -15,6 +15,9 @@
     <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.sound.min.js"></script>
     
     <script language="javascript" type="text/javascript" src="serial.js"></script>
+    <script language="javascript" type="text/javascript" src="space.js"></script>
+    <script language="javascript" type="text/javascript" src="p5ui.js"></script>
+    <script language="javascript" type="text/javascript" src="cereal.js"></script>
     <script language="javascript" type="text/javascript" src="sketch.js"></script>
     
     <script type="text/javascript">
@@ -38,12 +41,16 @@
 <body>
     <div id='serial-select-box' class="serial-select-box" hidden></div>
 <script>
+
+// Call setup socket in sketch.js
 if (setupSocket !== undefined) {
     var hostName = window.location.hostname
     setupSocket(hostName, '8000');
     alert('Connected to ' + hostName);
 }
 
+
+// Global slot
 function listSerialPorts(list) {
     // show box
     var $sel = $('#serial-select-box');
@@ -63,6 +70,7 @@ function listSerialPorts(list) {
     });
 }
 
+// Global slot
 function hideSerialPorts() {
     $('#serial-select-box').fadeOut();
 }
