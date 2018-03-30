@@ -56,6 +56,13 @@ class Cereal {
         this.connectedPort = port;
     }
 
+    // Disconnect
+    disconnect() {
+        this.serial.close();
+        console.log('Serial port closed');
+        this.connectedPort = undefined;
+    }
+
     // Handler functions
     connectHandler() {
         console.log('Serial server active; awaiting devices');
@@ -91,6 +98,12 @@ class Cereal {
 
     // Sends serialized data to controller
     sendVerticesToController(vertices, timeVector, space) {
+
+        // Check that serial device is connected
+        if (this.connectedPort === undefined) {
+            alert('Need to connect to a serial device first!');
+            return;
+        }
 
         // Check that the input is correct
         if (vertices.length != timeVector.length) {
@@ -138,5 +151,8 @@ class Cereal {
 
         // End array character
         this.sendChar(SCP.END_ARRAY);
+
+        // Alert user
+        alert(vertices.length + ' vertices sent to the controller');
     }
 }

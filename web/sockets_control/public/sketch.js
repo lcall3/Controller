@@ -63,21 +63,6 @@ const accel_k = 0.15;
 const accel_lim = 0.09;
 const vel_decay = 0.4;
 
-// Screen coords to pulse coords mapping constants
-const YAW_MIN = -100;
-const YAW_MAX = 100;
-const PITCH_MIN = -50;
-const PITCH_MAX = 50;
-
-// SCP
-const SCP = {
-    PARSE_ARRAY: '#',
-    START_ARRAY: '@',
-    ARRAY_SEPARATE: ',',
-    NEXT_ENTRY: '&',
-    END_ARRAY: '!'
-};
-
 // Sound
 var sfx_connected;
 var sfx_focus;
@@ -91,6 +76,10 @@ const btns_def_list = [
     ['Toggle Control', toggleControlEvent],
     ['Origin', zeroToOriginEvent]
 ];
+
+// Helping objs
+var space;
+var cereal;
 
 // p5 functions
 function setup() {
@@ -117,15 +106,18 @@ function setup() {
     soundFormats('mp3', 'ogg');
     sfx_connected = loadSound('assets/connect.ogg');
     sfx_focus = loadSound('assets/focus.ogg');
+
+    // Space conversion
+    space = new Space(boundSize);
+
+    // Serial communication with Controller
+    cereal = new Cereal();
 }
 
 function draw() {
     background(0);
-    fill(255);
-    textAlign(LEFT, BASELINE);
-    textSize(10);
-    text('lcall3 Controller beta v0.6', 20, 20);
-    text('Copyright 2018 (c) Muchen He', 20, 32);
+    drawCopyright('beta v0.7');
+
     if (isMobile) {
         drawMobileUI();
     } else {
@@ -134,24 +126,43 @@ function draw() {
 }
 
 
-function drawMobileUI() {
-    if (toggleMobileEmit) {
-        fill(255, 0, 0);
-    } else {
-        fill(255);
-    }
-    rect(0, height-20, width, height);
-
-    // Buttons
-    for (var i = 0, n = btns.length; i < n; i++) {
-        btns[i].draw();
-    }
+// Universal draw functions
+function drawCopyright(version) {
+    fill(255);
+    textAlign(LEFT, BASELINE);
+    textSize(10);
+    text('lcall3 Controller ' + version, 20, 20);
+    text('Copyright 2018 (c) Muchen He', 20, 32);
 }
 
 function playTone() {
     sfx_connected.play();
 }
 
+// ======== MOBILE DRAWING FUNCTIONS ========
+function drawMobileUI() {
+    // Draw gyro control indicator
+    drawGyroControlIndicator(toggleMobileEmit);
+
+    // Draw live control indictator
+    // TODO:
+
+    // Draw buttons
+    for (var i = 0, n = btns.length; i < n; i++) {
+        btns[i].draw();
+    }
+}
+
+function drawGyroControlIndicator(active) {
+    if (active) {
+        fill(255, 0, 0);
+    } else {
+        fill(255);
+    }
+    rect(0, height - 20, width, height);
+}
+
+// ======== HOST DRAWING FUNCTIONS ======
 function drawHostUI() {
     rectMode(CENTER);
     noFill();
@@ -177,9 +188,7 @@ function drawHostUI() {
     cursorY = d * tan(b);
 
     // Draw laser dot
-    stroke(255);
-    line(cursorX - 10, cursorY, cursorX + 10, cursorY);
-    line(cursorX, cursorY - 10, cursorX, cursorY + 10);
+    drawCursor();
 
     // Draw saved vertices
     drawVertices();
@@ -196,16 +205,27 @@ function drawHostUI() {
     drawTracer();
 }
 
+function drawCursor() {
+    // stroke(255);
+    // line(cursorX - 10, cursorY, cursorX + 10, cursorY);
+    // line(cursorX, cursorY - 10, cursorX, cursorY + 10);
+
+    fill('#F00');
+    ellipse(cursorX, cursorY, 14, 14);
+    fill(255);
+    ellipse(cursorX, cursorY, 5, 5);
+}
+
 function drawVertices() {
     noFill();
     stroke(150);
     for (var i = 0; i < vertices.length; i++) {
-        var vec = normToScreen(vertices[i]);
+        var vec = space.normToScreen(vertices[i]);
         var vecNext;
         if (i == vertices.length - 1) {
-            vecNext = normToScreen(vertices[0]);
+            vecNext = space.normToScreen(vertices[0]);
         } else {
-            vecNext = normToScreen(vertices[i + 1]);
+            vecNext = space.normToScreen(vertices[i + 1]);
         }
 
         // Draw shape made by the vertex
@@ -230,11 +250,16 @@ function drawVertexList() {
 }
 
 function drawHostSerialStatusUI() {
-    fill(connectedSerial !== '' ? '#8F8' : '#F88');
     noStroke();
     textAlign(CENTER, CENTER);
     textSize(16);
-    text(connectedSerial !== '' ? 'Serial connected to ' + connectedSerial : 'Serial offline', width / 2, 30);
+    if (cereal.connectedPort === undefined) {
+        fill('F88');
+        text('Serial offline', width / 2, 30);
+    } else {
+        fill('8F8');
+        text('Connected to ' + cereal.connectedPort, width / 2, 30);
+    }
 }
 
 var vertex_i = 0;
@@ -244,7 +269,7 @@ function drawTracer() {
 
     try {
         var nowL = vertices[vertex_i];
-        var now = normToScreen(nowL);
+        var now = space.normToScreen(nowL);
 
         // Update simulated kinematics
         accel = nowL.copy().sub(position).mult(accel_k).limit(accel_lim);
@@ -254,8 +279,8 @@ function drawTracer() {
         position.add(velocity);
 
         // Draw laser
-        var posS = normToScreen(position);
-        var posSp = normToScreen(position_prev);
+        var posS = space.normToScreen(position);
+        var posSp = space.normToScreen(position_prev);
         laserScreen.push();
         laserScreen.scale(0.5); // HACK: for some reason it is doubled
         laserScreen.fill(0,80);
@@ -309,7 +334,7 @@ function zeroToOriginEvent() {
 function onPushVertex() {
 
     // Add vertex
-    vertices.push(screenToNorm(createVector(cursorX, cursorY)));
+    vertices.push(space.screenToNorm(createVector(cursorX, cursorY)));
     var n = vertices.length;
     console.log('Vertex added: ', vertices[n - 1].x, vertices[n - 1].y);
 
@@ -338,30 +363,7 @@ function onPopVertex() {
     }
 }
 function onMasterProceed() {
-    sendVerticesToController();
-    alert(vertices.length + ' vertices sent to the controller');
-}
-
-// Util functions
-function screenToNorm(screenVec) {
-    return createVector(
-        constrain(map(screenVec.x, -boundSize/2, boundSize/2, -1, 1), -1, 1),
-        constrain(map(screenVec.y, -boundSize/2, boundSize/2, -1, 1), -1, 1)
-    );
-}
-
-function normToScreen(normVec) {
-    return createVector(
-        map(normVec.x, -1, 1, -boundSize/2, boundSize/2),
-        map(normVec.y, -1, 1, -boundSize/2, boundSize/2)
-    );
-}
-
-function normToPulses(normVec) {
-    return createVector(
-        map(normVec.x, -1, 1, YAW_MIN, YAW_MAX),
-        map(normVec.y, -1, 1, PITCH_MIN, PITCH_MAX)
-    );
+    cereal.sendVerticesToController(vertices, timeVector, space);
 }
 
 // Socket functions
@@ -412,17 +414,8 @@ function keyPressed() {
     if (!isMobile) {
         if (keyCode === 32) {   // space bar
             resetOrigin();
-        } else if (keyCode === 67) {    // 'c': connect to serial
-            console.log('Initializing serial...');
-            setupSerial();
-        } else if (keyCode === 68) {    // 'd': disconnect from serial
-            if (connectedSerial !== '') {
-                serial.close();
-                console.log('Serial port closed');
-                connectedSerial = '';
-            }
         } else if (keyCode === 83) {  // 's': save vertices and go
-            sendVerticesToController();
+            cereal.sendVerticesToController(vertices, timeVector, space);
         } else if (keyCode === 8) { // backspace
             onPopVertex();
         }
@@ -459,90 +452,6 @@ function touchStarted() {
     }
 }
 
-// Serial interfacing
-var serial;
-
-var connectedSerial = '';
-
-function setupSerial() {
-    serial = new p5.SerialPort();
-
-    // Bind signals
-    serial.on('connected', function() {
-        console.log('Serial server active; awaiting devices');
-    });
-
-    serial.on('list', function(list) {
-        
-        if (list.length !== 0) {
-            console.log('Available serial port list updated:');
-            if (listSerialPorts !== undefined) listSerialPorts(list);
-        } else {
-            alert('No serial port available');
-        }
-    });
-
-    serial.on('error', function(e) {
-        console.warn(e);
-    })
-
-    serial.on('data', SerialEvent);
-}
-
 function serialSelectPort(port) {
-    serial.open(port, { baudRate: 115200 }, function() {
-        console.log('Serial port opened at ' + port);
-    });
-    hideSerialPorts();
-    connectedSerial = port;
-}
-
-function SerialEvent(data) {
-    if (serial.available()) {
-        var c = serial.readChar();
-        console.log(connectedSerial + ': ' + c);
-    }
-}
-
-function sendVerticesToController() {
-    if (connectedSerial === '') return;
-
-    // Send size of array
-    sendChar(SCP.PARSE_ARRAY);
-    var n = parseInt(vertices.length).toString();
-    for (var ni = 0; ni < n.length; ni++) {
-        sendChar(n[ni]);
-    }
-
-    // Start the array
-    sendChar(SCP.START_ARRAY);
-
-    // Arrays to send:
-    for (var i = 0; i < vertices.length; i++) {
-        var pulseVec = normToPulses(vertices[i]);
-        var timeTo = timeVector[i];
-        var x = parseInt(pulseVec.x).toString();
-        var y = parseInt(pulseVec.y).toString();
-        var t = timeTo.toString();
-
-        // Send x, y, and time vector, separated by ','
-        for (var xi = 0; xi < x.length; xi++) {
-            sendChar(x[xi]);
-        }
-        sendChar(SCP.ARRAY_SEPARATE);
-        for (var yi = 0; yi < y.length; yi++) {
-            sendChar(y[yi]);
-        }
-        sendChar(SCP.ARRAY_SEPARATE);
-        for (var ti = 0; ti < t.length; ti++) {
-            sendChar(t[ti]);
-        }
-        sendChar(SCP.NEXT_ENTRY);
-    }
-    sendChar(SCP.END_ARRAY);
-}
-
-function sendChar(c) {
-    console.log(c);
-    serial.write(c);
+    cereal.commence(port);
 }
