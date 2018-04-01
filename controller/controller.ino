@@ -28,11 +28,20 @@
 #include "experimental.h"
 #include "communicate.h"
 
+#define _TEST_YAW_MOTOR
+
+#ifdef _TEST_YAW_MOTOR
+int g_vertices_x[] = { -1000, 1000 };
+int g_vertices_y[] = { 0, 0 };
+unsigned int g_vertices_time[] = { 1000, 1000 };
+unsigned char g_n_vertices = 2;
+#else
 // Shape array
 int *g_vertices_x;
 int *g_vertices_y;
 unsigned int *g_vertices_time;
 unsigned int g_n_vertices;
+#endif
 
 /* Timer 1 compare output ISR
  * Performs data acquisition and other controller flags
@@ -150,7 +159,11 @@ void setup() {
     #endif
 
     // Initial state
+    #ifdef _TEST_YAW_MOTOR
+    g_state = s_draw;
+    #else
     g_state = s_home_q0;
+    #endif
 
     // Initial desired
     g_desired_index = 0;
@@ -229,6 +242,8 @@ void loop() {
             }
         break;
         case s_listen:
+            #ifdef _TEST_YAW_MOTOR
+            #else
             if (Serial.available()) {
                 char in = Serial.read();
                 switch(in) {
@@ -242,7 +257,7 @@ void loop() {
                     break;
                 }
             }
-
+            #endif
         break;
         case s_draw:
 
@@ -269,9 +284,15 @@ void control_motor(char motor, int pwm) {
         // Set direction of motor movement
         digitalWrite(MOTOR0_DIREC, pwm > 0);
 
+        // FIXME:
+        if (pwm < 0) {
+            Serial.print('-');
+        }
+
         // Set pwm
         #ifdef USE_PWM_FLOOR
         pwm = constrain(abs(pwm), PWM_FLOOR, 255);
+        Serial.println(pwm, DEC);
         #else
         pwm = abs(pwm);
         #endif
@@ -336,6 +357,11 @@ inline void apply_control() {
     // Compute signed PWM
     int q0_pwm = int((K_P0 * q0_error) + (K_D0 * vg_q0_speed) + (K_I0 * g_q0_accum_error));
     int q1_pwm = int((K_P1 * q1_error) + (K_D1 * vg_q1_speed) + (K_I1 * g_q1_accum_error));
+
+    Serial.print(vg_q0_pos, DEC);
+    Serial.print(' ');
+    Serial.print(q0_pwm, DEC);
+    Serial.print(' ');
 
     // Send pwm to motors
     control_motor(MOTOR0_EN, q0_pwm);

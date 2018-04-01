@@ -28,9 +28,9 @@
 #include <Arduino.h>
 
 // [*] Q0 and Q1 PID gain
-#define K_P0 1.0f
+#define K_P0 1.7f
 #define K_I0 0.0f
-#define K_D0 0.0f
+#define K_D0 -3.0f
 #define K_P1 1.0f
 #define K_I1 0.0f
 #define K_D1 0.0f
@@ -62,7 +62,7 @@
 
 // [*]
 #ifdef USE_PWM_FLOOR
-#define PWM_FLOOR 30
+#define PWM_FLOOR 100
 #endif
 
 // ISR functions

@@ -41,7 +41,7 @@ class Cereal {
     commence(port, baudrate) {
 
         // Connect to the selected serial port
-        serial.open(port, {baudRate: baudrate}, function() {
+        this.serial.open(port, {baudRate: baudrate}, function() {
             console.log('Serial port opened at ' + port);
         });
 
