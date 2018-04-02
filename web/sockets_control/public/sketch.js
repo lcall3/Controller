@@ -48,10 +48,9 @@ var cursorY = 0;
 var boundSize = 600;
 
 // Physics enabled laser simulation variables
-/* TODO: */
-const timeFactor = 300;
-const minTimeRatio = 0.2;
-const maxTimeRatio = 2.0;
+var timeFactor = 300;
+var minTimeRatio = 0.2;
+var maxTimeRatio = 2.0;
 
 // Laser simulation preview
 var laserScreen;
@@ -124,8 +123,8 @@ function draw() {
     fill(255);
     textAlign(LEFT, BASELINE);
     textSize(10);
-    text('lcall3 Controller beta v0.6', 20, 20);
-    text('Copyright 2018 (c) Muchen He', 20, 32);
+    text('lcall3 Controller v1.0', 20, 30);
+    text('Copyright 2018 (c) Muchen He', 20, 42);
     if (isMobile) {
         drawMobileUI();
     } else {
@@ -192,6 +191,9 @@ function drawHostUI() {
     // Draw serial status UI
     drawHostSerialStatusUI();
 
+    // Draw time vector UI
+    drawTimeVectorUI();
+
     // Update drawing of tracer
     drawTracer();
 }
@@ -216,13 +218,13 @@ function drawVertices() {
 
 function drawVertexList() {
     var x = 20;
-    var y = 50;
+    var y = 64;
     textSize(12);
     fill(255);
     for (var i = 0; i < vertices.length; i++) {
         var vec = vertices[i];
         text(
-            '(' + vec.x + ', ' + vec.y + '):' + timeVector[i] + 'ms',
+            '(' + vec.x.toPrecision(4) + ', ' + vec.y.toPrecision(4) + '): ' + timeVector[i] + 'ms',
             x,
             y + i * 14
         );
@@ -235,6 +237,12 @@ function drawHostSerialStatusUI() {
     textAlign(CENTER, CENTER);
     textSize(16);
     text(connectedSerial !== '' ? 'Serial connected to ' + connectedSerial : 'Serial offline', width / 2, 30);
+}
+
+function drawTimeVectorUI() {
+    fill(255);
+    textSize(12);
+    text('Base time: ' + timeFactor + 'ms', width - 80, 30);
 }
 
 var vertex_i = 0;
@@ -425,6 +433,14 @@ function keyPressed() {
             sendVerticesToController();
         } else if (keyCode === 8) { // backspace
             onPopVertex();
+        } else if (keyCode === 187) {   // +: increase time vector
+            if (timeFactor < 2000) {
+                timeFactor += 100;
+            }
+        } else if (keyCode === 189) {   // -: decrease time vector base time
+            if (timeFactor > 100) {
+                timeFactor -= 100;
+            }
         }
     }
 }
