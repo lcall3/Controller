@@ -37,8 +37,8 @@
 
 // Directional control pins
 #define MOTOR0_DIRECA A0
-#define MOTOR0_DIRECB A1
-#define MOTOR1_DIRECA A2
+#define MOTOR0_DIRECB A2
+#define MOTOR1_DIRECA A1
 #define MOTOR1_DIRECB A3
 
 // Homing pins
