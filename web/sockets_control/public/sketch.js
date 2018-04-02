@@ -418,7 +418,7 @@ function onOrientationChange(e) {
 // User interfacing
 function keyPressed() {
     if (!isMobile) {
-        if (keyCode === 32) {   // space bar
+        if (keyCode === 32) {           // space bar: manually reset origin
             resetOrigin();
         } else if (keyCode === 67) {    // 'c': connect to serial
             console.log('Initializing serial...');
@@ -429,9 +429,9 @@ function keyPressed() {
                 console.log('Serial port closed');
                 connectedSerial = '';
             }
-        } else if (keyCode === 83) {  // 's': save vertices and go
+        } else if (keyCode === 83) {    // 's': save vertices and go
             sendVerticesToController();
-        } else if (keyCode === 8) { // backspace
+        } else if (keyCode === 8) {     // backspace: pop last vertex
             onPopVertex();
         } else if (keyCode === 187) {   // +: increase time vector
             if (timeFactor < 2000) {
@@ -441,6 +441,10 @@ function keyPressed() {
             if (timeFactor > 100) {
                 timeFactor -= 100;
             }
+        } else if (keyCode === 72) {    // 'h': help
+            window.open('help.html');
+        } else if (keyCode === 81) {    // 'q': quit back to listening
+            // TODO:
         }
     }
 }
