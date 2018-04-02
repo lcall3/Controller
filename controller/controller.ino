@@ -28,11 +28,18 @@
 #include "experimental.h"
 #include "communicate.h"
 
-#define _TEST_YAW_MOTOR
+//#define _TEST_YAW_MOTOR
+//#define _TEST_PITCH_MOTOR
 
 #ifdef _TEST_YAW_MOTOR
-int g_vertices_x[] = { -1000, 1000 };
+int g_vertices_x[] = { -100, 100 };
 int g_vertices_y[] = { 0, 0 };
+unsigned int g_vertices_time[] = { 1000, 1000 };
+unsigned char g_n_vertices = 2;
+#else
+#ifdef _TEST_PITCH_MOTOR
+int g_vertices_x[] = { 0, 0 };
+int g_vertices_y[] = { -100, 100 };
 unsigned int g_vertices_time[] = { 1000, 1000 };
 unsigned char g_n_vertices = 2;
 #else
@@ -41,6 +48,7 @@ int *g_vertices_x;
 int *g_vertices_y;
 unsigned int *g_vertices_time;
 unsigned int g_n_vertices;
+#endif
 #endif
 
 /* Timer 1 compare output ISR
@@ -159,7 +167,11 @@ void setup() {
     #ifdef _TEST_YAW_MOTOR
     g_state = s_draw;
     #else
+    #ifdef _TEST_PITCH_MOTOR
+    g_state = s_draw;
+    #else
     g_state = s_home_q0;
+    #endif
     #endif
 
     // Initial desired
@@ -237,6 +249,8 @@ void loop() {
             }
         break;
         case s_listen:
+            #ifndef _TEST_YAW_MOTOR
+            #ifndef _TEST_PITCH_MOTOR
             if (Serial.available()) {
                 char in = Serial.read();
 
@@ -255,6 +269,8 @@ void loop() {
                     break;
                 }
             }
+            #endif
+            #endif
         break;
         case s_draw:
 
