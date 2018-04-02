@@ -414,8 +414,14 @@ function keyPressed() {
     if (!isMobile) {
         if (keyCode === 32) {   // space bar
             resetOrigin();
+        } else if (keyCode === 67) {    // 'c': connect
+            if (cereal !== undefined) {
+                cereal.listAgain();
+            }
         } else if (keyCode === 83) {  // 's': save vertices and go
-            cereal.sendVerticesToController(vertices, timeVector, space);
+            if (cereal !== undefined) {
+                cereal.sendVerticesToController(vertices, timeVector, space);
+            }
         } else if (keyCode === 8) { // backspace
             onPopVertex();
         }

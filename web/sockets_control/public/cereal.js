@@ -28,13 +28,18 @@ class Cereal {
         // Serial port object
         this.serial = new p5.SerialPort();
 
+        // Default connected serial port is undefined
+        this.connectedPort = undefined;
+
+        // Setup handlers
+        this.setup();
+    }
+
+    setup() {
         this.serial.on('connected', this.connectHandler);
         this.serial.on('list', this.listHandler);
         this.serial.on('error', this.errorHandler);
         this.serial.on('data', this.dataHandler);
-
-        // Default connected serial port is undefined
-        this.connectedPort = undefined;
     }
 
     // Select serial port function
@@ -76,6 +81,13 @@ class Cereal {
             } else {
                 console.error('Cereal list handler cannot find listSerialPorts function');
             }
+            this.list = list;
+        }
+    }
+
+    listAgain() {
+        if (this.list !== undefined) {
+            this.listHandler(this.list);
         }
     }
 
