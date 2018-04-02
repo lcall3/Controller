@@ -28,7 +28,7 @@ function socketEmit(cmd, data) {
 var isMobile = false;
 var toggleMobileEmit = false;
 var drawLaser = true;
-var mouseDrawEnabled = false;
+var mouseDrawEnabled = true;
 
 // detect mobile rotation
 var angle_alpha = 0;
@@ -49,7 +49,7 @@ var boundSize = 600;
 
 // Physics enabled laser simulation variables
 /* TODO: */
-const timeFactor = 100;
+const timeFactor = 300;
 const minTimeRatio = 0.2;
 const maxTimeRatio = 2.0;
 

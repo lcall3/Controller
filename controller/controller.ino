@@ -28,12 +28,12 @@
 #include "experimental.h"
 #include "communicate.h"
 
-//#define _TEST_YAW_MOTOR
+#define _TEST_YAW_MOTOR
 //#define _TEST_PITCH_MOTOR
 #define _SKIP_HOMING
 
 #ifdef _TEST_YAW_MOTOR
-int g_vertices_x[] = { -100, 100 };
+int g_vertices_x[] = { 100, -100 };
 int g_vertices_y[] = { 0, 0 };
 unsigned int g_vertices_time[] = { 1000, 1000 };
 unsigned char g_n_vertices = 2;
@@ -164,7 +164,8 @@ void setup() {
     vg_control_flag      = 0;
     vg_output_serial_flag = 0;
 
-    g_state = s_listen;
+    // FIXME:
+    g_state = s_draw;
 
     // Initial desired
     g_desired_index = 0;
@@ -241,24 +242,24 @@ void loop() {
             }
         break;
         case s_listen:
-            if (Serial.available()) {
-                char in = Serial.read();
+            // if (Serial.available()) {
+            //     char in = Serial.read();
 
-                // Controller to do certain tasks when listening
-                switch(in) {
-                    case PARSE_ARRAY:
-                        g_n_vertices = parse_array(&g_vertices_x, &g_vertices_y, &g_vertices_time);
-                        if (g_n_vertices > 0) {
+            //     // Controller to do certain tasks when listening
+            //     switch(in) {
+            //         case PARSE_ARRAY:
+            //             g_n_vertices = parse_array(&g_vertices_x, &g_vertices_y, &g_vertices_time);
+            //             if (g_n_vertices > 0) {
 
-                            // Array parsed correctly, go to draw
-                            g_state = s_draw;
-                        };
-                    break;
-                    case IMMEDIATE_POS:
-                        // TODO:
-                    break;
-                }
-            }
+            //                 // Array parsed correctly, go to draw
+            //                 g_state = s_draw;
+            //             };
+            //         break;
+            //         case IMMEDIATE_POS:
+            //             // TODO:
+            //         break;
+            //     }
+            // }
         break;
         case s_draw:
 
@@ -293,6 +294,7 @@ void control_motor(char motor, long pwm) {
 
         // Set pwm
         pwm = constrain(abs(pwm), PWM_FLOOR, 255);
+        Serial.println(pwm, DEC);
 
         // Write to pin
         analogWrite(MOTOR0_EN, pwm);
@@ -360,9 +362,17 @@ inline void apply_control() {
     long q0_pwm = long((K_P0 * q0_error) + (K_D0 * vg_q0_speed) + (K_I0 * g_q0_accum_error));
     long q1_pwm = long((K_P1 * q1_error) + (K_D1 * vg_q1_speed) + (K_I1 * g_q1_accum_error));
 
+    Serial.print(q0_desired, DEC);
+    Serial.print(' ');
+    Serial.print(vg_q0_pos, DEC);
+    Serial.print(' ');
+    Serial.print(q0_pwm, DEC);
+    Serial.print(' ');
+
     // Send pwm to motors
     control_motor(MOTOR0_EN, q0_pwm);
     control_motor(MOTOR1_EN, q1_pwm);
+
 
     // Reset control flag
     vg_control_flag = false;
