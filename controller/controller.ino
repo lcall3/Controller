@@ -265,6 +265,13 @@ void loop() {
 
             // Normal controller code
             apply_control();
+
+            // Check for stop signal
+            if (Serial.available()) {
+                if (Serial.read() == STOP_DRAW) {
+                    g_state = s_listen;
+                }
+            }
         break;
         default:
             // Should never be here, reset if needed

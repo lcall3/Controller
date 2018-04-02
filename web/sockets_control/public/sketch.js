@@ -74,7 +74,8 @@ const SCP = {
     START_ARRAY: '@',
     ARRAY_SEPARATE: ',',
     NEXT_ENTRY: '&',
-    END_ARRAY: '!'
+    END_ARRAY: '!',
+    STOP_DRAWING: '$'
 };
 
 // Sound
@@ -443,8 +444,8 @@ function keyPressed() {
             }
         } else if (keyCode === 72) {    // 'h': help
             window.open('help.html');
-        } else if (keyCode === 81) {    // 'q': quit back to listening
-            // TODO:
+        } else if (keyCode === 81) {    // 'q': quit back to listening (stop drawing)
+            stopDrawing();
         }
     }
 }
@@ -565,6 +566,10 @@ function sendVerticesToController() {
 function sendChar(c) {
     console.log(c);
     serial.write(c);
+}
+
+function stopDrawing() {
+    sendChar(SCP.STOP_DRAWING);
 }
 
 class Button {
