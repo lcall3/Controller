@@ -103,17 +103,15 @@ long g_q1_accum_error;
 volatile unsigned long vg_time_vector_count;
 
 // ISR timed control flags
-#ifdef USE_SERIAL
-volatile char vg_output_serial;
-#endif
 volatile char vg_control_flag;
+volatile char vg_output_serial_flag;
 
 // Main state machine
 enum states {s_idle, s_home_q0, s_home_q1, s_listen, s_draw};
 char g_state;
 
 // === === ===[ Function prototypes ]=== === ===
-void control_motor(char, int);
+void control_motor(char, long);
 void stop_all();
 void apply_control();
 void compute_vertices(const float *, const float *, int *, int *);

@@ -36,12 +36,14 @@
 #define MOTOR1_EN 5
 
 // Directional control pins
-#define MOTOR0_DIREC A0
-#define MOTOR1_DIREC A1
+#define MOTOR0_DIRECA A0
+#define MOTOR0_DIRECB A1
+#define MOTOR1_DIRECA A2
+#define MOTOR1_DIRECB A3
 
 // Homing pins
-#define HOMING0 A2
-#define HOMING1 A3
+#define HOMING0 A6
+#define HOMING1 A7
 
 // I2C line uses A4 and A5 (reserved)
 
@@ -58,9 +60,5 @@
 // User interfacing
 #define BTN_A 2
 #define BTN_B 3
-
-// ADC available aux pins
-#define AUX_A6 A6
-#define AUX_A7 A7
 
 #endif

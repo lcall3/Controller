@@ -24,7 +24,6 @@
 #include "communicate.h"
 #include <Arduino.h>
 
-
 int parse_array ( int **x, int **y, unsigned int **t) {
     // input byte from serial port
     char inputByte;
@@ -155,4 +154,3 @@ int parse_array ( int **x, int **y, unsigned int **t) {
         }
     }
 }
-

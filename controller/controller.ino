@@ -153,10 +153,7 @@ void setup() {
     g_q1_accum_error     = 0;
     vg_time_vector_count = 0;
     vg_control_flag      = 0;
-
-    #ifdef USE_SERIAL
-    vg_output_serial = 0;
-    #endif
+    vg_output_serial_flag = 0;
 
     // Initial state
     #ifdef _TEST_YAW_MOTOR
@@ -204,9 +201,7 @@ void setup() {
     interrupts();
 
     // Enable serial
-    #ifdef USE_SERIAL
     Serial.begin(SERIAL_BAUD_RATE);
-    #endif
 }
 
 /* Main program loop
@@ -242,10 +237,10 @@ void loop() {
             }
         break;
         case s_listen:
-            #ifdef _TEST_YAW_MOTOR
-            #else
             if (Serial.available()) {
                 char in = Serial.read();
+
+                // Controller to do certain tasks when listening
                 switch(in) {
                     case PARSE_ARRAY:
                         g_n_vertices = parse_array(&g_vertices_x, &g_vertices_y, &g_vertices_time);
@@ -255,9 +250,11 @@ void loop() {
                             g_state = s_draw;
                         };
                     break;
+                    case IMMEDIATE_POS:
+                        // TODO:
+                    break;
                 }
             }
-            #endif
         break;
         case s_draw:
 
@@ -278,35 +275,35 @@ void loop() {
  *
  * EXEC TIME: 20us
  */
-void control_motor(char motor, int pwm) {
+void control_motor(char motor, long pwm) {
     if (motor == MOTOR0_EN) {
 
         // Set direction of motor movement
-        digitalWrite(MOTOR0_DIREC, pwm > 0);
-
-        // FIXME:
-        if (pwm < 0) {
-            Serial.print('-');
+        if (pwm > 0) {
+            digitalWrite(MOTOR0_DIRECA, HIGH);
+            digitalWrite(MOTOR0_DIRECB, LOW);
+        } else {
+            digitalWrite(MOTOR0_DIRECA, LOW);
+            digitalWrite(MOTOR0_DIRECB, HIGH);
         }
 
         // Set pwm
-        #ifdef USE_PWM_FLOOR
         pwm = constrain(abs(pwm), PWM_FLOOR, 255);
-        Serial.println(pwm, DEC);
-        #else
-        pwm = abs(pwm);
-        #endif
 
         // Write to pin
         analogWrite(MOTOR0_EN, pwm);
         
     } else if (motor == MOTOR1_EN) {
-        digitalWrite(MOTOR1_DIREC, pwm > 0);
-        #ifdef USE_PWM_FLOOR
+
+        if (pwm > 0) {
+            digitalWrite(MOTOR1_DIRECA, HIGH);
+            digitalWrite(MOTOR1_DIRECB, LOW);
+        } else {
+            digitalWrite(MOTOR1_DIRECA, LOW);
+            digitalWrite(MOTOR1_DIRECB, HIGH);
+        }
+
         pwm = constrain(abs(pwm), PWM_FLOOR, 255);
-        #else
-        pwm = abs(pwm);
-        #endif
         analogWrite(MOTOR1_EN, pwm);
     }
 }
@@ -321,6 +318,7 @@ inline void stop_all() {
 }
 
 /* Apply the PID control to both motors
+ * TODO: the desired positions be abstracted outside of this function
  *
  * EXEC TIME: 190us
  */
@@ -355,13 +353,8 @@ inline void apply_control() {
     g_q1_accum_error += q1_error;
 
     // Compute signed PWM
-    int q0_pwm = int((K_P0 * q0_error) + (K_D0 * vg_q0_speed) + (K_I0 * g_q0_accum_error));
-    int q1_pwm = int((K_P1 * q1_error) + (K_D1 * vg_q1_speed) + (K_I1 * g_q1_accum_error));
-
-    Serial.print(vg_q0_pos, DEC);
-    Serial.print(' ');
-    Serial.print(q0_pwm, DEC);
-    Serial.print(' ');
+    long q0_pwm = long((K_P0 * q0_error) + (K_D0 * vg_q0_speed) + (K_I0 * g_q0_accum_error));
+    long q1_pwm = long((K_P1 * q1_error) + (K_D1 * vg_q1_speed) + (K_I1 * g_q1_accum_error));
 
     // Send pwm to motors
     control_motor(MOTOR0_EN, q0_pwm);

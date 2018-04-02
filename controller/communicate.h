@@ -31,6 +31,8 @@
 #define END_ARRAY '!'
 #define PARSE_ARRAY '#'
 
+#define IMMEDIATE_POS '$'
+
 int parse_array (int **x, int **y, unsigned int **t);
 
 enum {
