@@ -30,6 +30,7 @@
 
 //#define _TEST_YAW_MOTOR
 //#define _TEST_PITCH_MOTOR
+#define _SKIP_HOMING
 
 #ifdef _TEST_YAW_MOTOR
 int g_vertices_x[] = { -100, 100 };
@@ -163,16 +164,7 @@ void setup() {
     vg_control_flag      = 0;
     vg_output_serial_flag = 0;
 
-    // Initial state
-    #ifdef _TEST_YAW_MOTOR
-    g_state = s_draw;
-    #else
-    #ifdef _TEST_PITCH_MOTOR
-    g_state = s_draw;
-    #else
-    g_state = s_home_q0;
-    #endif
-    #endif
+    g_state = s_listen;
 
     // Initial desired
     g_desired_index = 0;
@@ -249,8 +241,6 @@ void loop() {
             }
         break;
         case s_listen:
-            #ifndef _TEST_YAW_MOTOR
-            #ifndef _TEST_PITCH_MOTOR
             if (Serial.available()) {
                 char in = Serial.read();
 
@@ -269,8 +259,6 @@ void loop() {
                     break;
                 }
             }
-            #endif
-            #endif
         break;
         case s_draw:
 
