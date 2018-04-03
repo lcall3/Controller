@@ -28,9 +28,9 @@
 #include <Arduino.h>
 
 // [*] Q0 and Q1 PID gain
-#define K_P0 0.1f
-#define K_I0 0.0f
-#define K_D0 -0.5f
+#define K_P0 19.5f
+#define K_I0 0.005f
+#define K_D0 -0.8f
 
 #define K_P1 10.0f
 #define K_I1 0.0f

@@ -23,8 +23,11 @@
 #define PULSE_PER_REV 400       // Pulses per revolution of encoder
 
 // Pins
-#define Q0_ENCODER_A 5          // PORTD 5
-#define Q0_ENCODER_B 6          // PORTD 6
+#define Q0_ENCODER_A 7          // PORTD 5
+#define Q0_ENCODER_B 8          // PORTD 6
+
+#define Q0_DIR_A A1
+#define Q0_DIR_B A3
 
 // Whether or not using current driver or power supply
 #define Q0_USING_CURRENT_DRIVER
@@ -32,7 +35,7 @@
 #ifdef Q0_USING_CURRENT_DRIVER
 
 // Pins for output to current driver
-#define Q0_EN_PIN 11
+#define Q0_EN_PIN 5
 
 // PWN control
 String input_pwm;
@@ -147,6 +150,8 @@ void loop() {
 
         // Write to motor
         analogWrite(Q0_EN_PIN, pwm);
+        digitalWrite(Q0_DIR_A, HIGH);
+        digitalWrite(Q0_DIR_B, LOW);
     }
     #endif
 }

@@ -33,9 +33,9 @@
 #define _SKIP_HOMING
 
 #ifdef _TEST_YAW_MOTOR
-int g_vertices_x[] = { 100, -100 };
+int g_vertices_x[] = { 20, -20 };
 int g_vertices_y[] = { 0, 0 };
-unsigned int g_vertices_time[] = { 1000, 1000 };
+unsigned int g_vertices_time[] = { 500, 500 };
 unsigned char g_n_vertices = 2;
 #else
 #ifdef _TEST_PITCH_MOTOR
