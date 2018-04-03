@@ -31,21 +31,21 @@ int cycle_time;
 #endif
 
 // PID Values
-#define P_GAIN 10.7f    // [*]
+#define P_GAIN 100.7f    // [*]
 #define D_GAIN -48.0f    // [*]
 #define I_GAIN 0.000f      // [*]
 
 // Initial PWM Value for Homing
 #define INIT_PWM 60
 
+
 // Pins
-#define Q0_ENCODER_A 3          // PORTD 5
-#define Q0_ENCODER_B 2          // PORTD 6
-#define Q0_EN_PIN 11
-#define Q0_DIR_A 8             // Using analog pins as digital IO
-#define Q0_DIR_B 9
-#define Q0_HOME A0               // Homing pin
-#define DEMO_TOGGLE A1
+#define Q0_ENCODER_A 10          // PORTD 5
+#define Q0_ENCODER_B 9          // PORTD 6
+#define Q0_EN_PIN 5
+#define Q0_DIR_A A1             // Using analog pins as digital IO
+#define Q0_DIR_B A3
+#define Q0_HOME A2               // Homing pin
 
 // PWN control
 int q0_pwm;
@@ -157,19 +157,10 @@ void setup() {
     q0_speed              = 0;
     q0_desired_pos        = TEST_STEP_DESIRED_POS;
     q0_accum              = 0;
-
-    // cycle_time = (digitalRead(DEMO_TOGGLE) == HIGH) ? UNIT_SQUARE_CYCLE_TIME : UNIT_SQUARE_CYCLE_TIME_1;
-    if (digitalRead(DEMO_TOGGLE)) {
-        cycle_time = UNIT_SQUARE_CYCLE_TIME;
-    } else {
-        cycle_time = UNIT_SQUARE_CYCLE_TIME_1;
-    }
-
-    // State
     state = 0;
 
     scounter = 0;
-    output_serial = false;
+    output_serial = true;
 
     #ifdef UNIT_SQUARE
     toggle_unit_square = false;
@@ -181,38 +172,22 @@ void setup() {
     attachPCINT(digitalPinToPCINT(Q0_ENCODER_A), q0_encoderA_ISR, CHANGE);
     attachPCINT(digitalPinToPCINT(Q0_ENCODER_B), q0_encoderB_ISR, CHANGE);
 
-    #ifdef Q0_USING_CURRENT_DRIVER
+    // #ifdef Q0_USING_CURRENT_DRIVER
     pinMode(Q0_EN_PIN, OUTPUT);
-    #endif
+    pinMode(Q0_DIR_A, OUTPUT);
+   //  #endif
     
     // Initiate timer 1
-    init_timer1();
+   init_timer1();
 
     // Enable all interrupts
-    interrupts();
+   interrupts();
 
     // Serial
     Serial.begin(9600);
 }
 
 void loop() {
-//
-//    // INIT STATE
-//    if (state == 0) {
-//        q0_pwm = INIT_PWM;
-//        digitalWrite(Q0_DIR_A, 1);
-//        digitalWrite(Q0_DIR_B, 0);
-//        // Send PWM output
-//        analogWrite(Q0_EN_PIN, q0_pwm);
-//        while (digitalRead(Q0_HOME) == HIGH);
-//        // Set to OPERATING STATE
-//        state = 1;
-//        q0_position = 88;
-//        Serial.println("Start");
-//    }
-
-//    // OPERATING STATE
-//    else {
       // Compute control PWM
       if (control_flag) {
           control_flag = false;
@@ -226,8 +201,9 @@ void loop() {
           q0_pwm += I_GAIN * q0_accum;
 
           // Set direction and abs PWM
-          digitalWrite(Q0_DIR_A, q0_pwm > 0);
-          digitalWrite(Q0_DIR_B, q0_pwm < 0);
+          // digitalWrite(Q0_DIR_A, q0_pwm > 0);
+          digitalWrite(A1, HIGH);
+          digitalWrite(A3, LOW);
           q0_pwm = abs(q0_pwm);
 
           // Limit PWM
@@ -236,34 +212,12 @@ void loop() {
           #endif
 
           // Send PWM output
-          analogWrite(Q0_EN_PIN, q0_pwm);
+          analogWrite(Q0_EN_PIN, 255); //**
       }
 
-      // Send to Serial when output flag is enabled
+      // // Send to Serial when output flag is enabled
       if (output_serial) {
           Serial.println(q0_position, DEC);
           output_serial = false;
       }
-
-      // Change desired position when its corresponding flag is enabled
-      #ifdef UNIT_SQUARE
-      if (toggle_unit_square) {
-          if (digitalRead(DEMO_TOGGLE) == HIGH) {
-              if (q0_desired_pos > 0) {
-                  q0_desired_pos = -TEST_STEP_DESIRED_POS;
-              } else {
-                  q0_desired_pos = TEST_STEP_DESIRED_POS;
-              }
-          } else {
-              if (q0_desired_pos > 0) {
-                  q0_desired_pos = -TEST_STEP_DESIRED_POS_1;
-              } else {
-                  q0_desired_pos = TEST_STEP_DESIRED_POS_1;
-              }
-          }
-          
-          toggle_unit_square = false;
-      }
-      #endif
-//    }
 }
