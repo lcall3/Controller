@@ -72,7 +72,7 @@ int parse_array ( int **x, int **y, unsigned int **t, unsigned char **laser) {
                 *laser = (unsigned char *) malloc(arrayLength * (sizeof(unsigned char)));
 
                 for (int i = 0; i < arrayLength; i++) {
-                  *(*laser + index) = 1;
+                  *(*laser + i) = 1;
                 }
             }
 

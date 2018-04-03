@@ -28,12 +28,12 @@
 #include <Arduino.h>
 
 // [*] Q0 and Q1 PID gain
-#define K_P0 10.5f
+#define K_P0 10.0f
 #define K_I0 0.005f
 #define K_D0 -10.0f
 
-#define K_P1 2.0f
-#define K_I1 0.001f
+#define K_P1 3.6f
+#define K_I1 0.02f
 #define K_D1 -5.0f
 
 // [*] Range of motion in pulses

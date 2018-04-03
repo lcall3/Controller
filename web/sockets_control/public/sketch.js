@@ -63,8 +63,8 @@ const accel_lim = 0.09;
 const vel_decay = 0.4;
 
 // Screen coords to pulse coords mapping constants
-const YAW_MIN = -30;
-const YAW_MAX = 30;
+const YAW_MIN = 30;
+const YAW_MAX = -30;
 const PITCH_MIN = -30;
 const PITCH_MAX = 30;
 
@@ -527,6 +527,8 @@ function SerialEvent(data) {
 
 function sendVerticesToController() {
     if (connectedSerial === '') return;
+
+    sendChar(SCP.STOP_DRAWING);
 
     // Send size of array
     sendChar(SCP.PARSE_ARRAY);

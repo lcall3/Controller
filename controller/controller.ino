@@ -28,19 +28,33 @@
 #include "experimental.h"
 #include "communicate.h"
 
-//#define _SKIP_SHAPE
-//#define _SERIAL_DEBUG
+// #define _SKIP_SHAPE
+// #define _SERIAL_DEBUG
 
 #ifdef _SKIP_SHAPE
-int g_vertices_x[] = { 10, 10, -10, -10 };
-int g_vertices_y[] = { -20, 20, 20, -20 };
-unsigned int g_vertices_time[] = { 100, 100, 100, 100 };
+int g_vertices_x[] = {-10, -10, 10, 10};
+int g_vertices_y[] = {0, -20, -20, 0};
+unsigned int g_vertices_time[] = {200, 200, 200, 200};
 unsigned char g_n_vertices = 4;
+unsigned char g_laser_en[] = {0, 1, 0, 1};
+/* FIGURE OF EIGHT*/
+// int g_vertices_x[] = { -10, 0, 10, -10, 0, 10 };
+// int g_vertices_y[] = { 10, 0, -10, -10, 0, 10};
+// unsigned int g_vertices_time[] = { 200, 200, 200, 200, 200, 200 };
+// unsigned char g_n_vertices = 6;
+// unsigned char g_laser_en[] = {1, 1, 1, 1, 1, 1};
+
+// int g_vertices_x[] = { -20, 20, 20, -20 };
+// int g_vertices_y[] = { -10, -10, 10, 10 };
+// unsigned int g_vertices_time[] = { 500, 500, 500, 500 };
+// unsigned char g_n_vertices = 4;
+// unsigned char g_laser_en[] = {1, 0, 1, 0};
 #else
 // Shape array
 int *g_vertices_x;
 int *g_vertices_y;
 unsigned int *g_vertices_time;
+unsigned char *g_laser_en;
 unsigned int g_n_vertices;
 #endif
 
@@ -188,6 +202,10 @@ void setup() {
     // Button pins
     pinMode(BTN_A, INPUT_PULLUP);
     pinMode(BTN_B, INPUT_PULLUP);
+
+    // Laser pins
+    pinMode(LASER_CONTROL, OUTPUT);
+
     // === === ===[ End of set pin mode ]=== === ===
 
     // Initialize timer 1
@@ -207,10 +225,10 @@ void setup() {
  */
 char test;
 void loop() {
-//    #ifdef _SERIAL_DEBUG
-//    Serial.print(g_state, DEC);
-//    Serial.print(' ');
-//    #endif
+    #ifdef _SERIAL_DEBUG
+    Serial.print(g_state, DEC);
+    Serial.print(' ');
+    #endif
 
     switch(g_state) {
         case s_idle:
@@ -218,7 +236,7 @@ void loop() {
         break;
         case s_home_q0:
             // This state should move motor 0 until it is homed
-            control_motor(MOTOR0_EN, 120);
+            control_motor(MOTOR0_EN, 150);
 
             if (analogRead(HOMING0) > 1000) {
                 g_state = s_listen; //g_state = s_home_q1;
@@ -229,8 +247,11 @@ void loop() {
             }
         break;
         case s_home_q1:
+            // Set laser on/off
+            digitalWrite(LASER_CONTROL, HIGH);
+
             // This state should move motor 1 until it is homed
-            control_motor(MOTOR1_EN, -220);
+            control_motor(MOTOR1_EN, -255);
 
             // Put yaw motor to position 0
             apply_control(true);
@@ -252,7 +273,7 @@ void loop() {
                 // Controller to do certain tasks when listening
                 switch(in) {
                     case PARSE_ARRAY:
-                        g_n_vertices = parse_array(&g_vertices_x, &g_vertices_y, &g_vertices_time);
+                        g_n_vertices = parse_array(&g_vertices_x, &g_vertices_y, &g_vertices_time, &g_laser_en);
                         if (g_n_vertices > 0) {
 
                             // Array parsed correctly, go to draw
@@ -264,6 +285,8 @@ void loop() {
                     break;
                 }
             }
+            #else
+            g_state = s_draw;
             #endif
         break;
         case s_draw:
@@ -370,7 +393,11 @@ inline void apply_control(bool is_homing) {
             g_desired_index++;
         }
         vg_time_vector_count = 0;
+
+        // Set laser on/off
+        digitalWrite(LASER_CONTROL, g_laser_en[g_desired_index] == 0 ? LOW : HIGH);
     }
+
 
     // Get desired position
     q0_desired = g_vertices_x[g_desired_index];
