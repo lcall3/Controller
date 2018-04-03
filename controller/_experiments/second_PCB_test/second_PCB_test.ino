@@ -28,21 +28,11 @@
 #include "experimental.h"
 #include "communicate.h"
 
-#define _SKIP_SHAPE
-// #define _SERIAL_DEBUG
-
-#ifdef _SKIP_SHAPE
-int g_vertices_x[] = { 10, 10, -10, -10 };
-int g_vertices_y[] = { -20, 20, 20, -20 };
-unsigned int g_vertices_time[] = { 500, 500, 500, 500 };
-unsigned char g_n_vertices = 4;
-#else
 // Shape array
 int *g_vertices_x;
 int *g_vertices_y;
 unsigned int *g_vertices_time;
 unsigned int g_n_vertices;
-#endif
 
 /* Timer 1 compare output ISR
  * Performs data acquisition and other controller flags
@@ -154,9 +144,13 @@ void setup() {
     g_q1_accum_error     = 0;
     vg_time_vector_count = 0;
     vg_control_flag      = 0;
-    vg_output_serial_flag = 0;
 
-    g_state = s_home_q0;
+    #ifdef USE_SERIAL
+    vg_output_serial = 0;
+    #endif
+
+    // Initial state
+    g_state = s_listen;
 
     // Initial desired
     g_desired_index = 0;
@@ -182,8 +176,8 @@ void setup() {
     pinMode(MOTOR1_EN, OUTPUT);
 
     // Homing pins
-    pinMode(HOMING0, INPUT);
-    pinMode(HOMING1, INPUT);
+    pinMode(HOMING0, INPUT_PULLUP);
+    pinMode(HOMING1, INPUT_PULLUP);
 
     // Button pins
     pinMode(BTN_A, INPUT_PULLUP);
@@ -197,7 +191,9 @@ void setup() {
     interrupts();
 
     // Enable serial
+    #ifdef USE_SERIAL
     Serial.begin(SERIAL_BAUD_RATE);
+    #endif
 }
 
 /* Main program loop
@@ -205,22 +201,15 @@ void setup() {
  *
  * EXEC TIME:   N/A
  */
-char test;
 void loop() {
-    #ifdef _SERIAL_DEBUG
-    Serial.print(g_state, DEC);
-    Serial.print(' ');
-    #endif
-
     switch(g_state) {
         case s_idle:
             g_state = s_home_q0;
         break;
         case s_home_q0:
             // This state should move motor 0 until it is homed
-            control_motor(MOTOR0_EN, 120);
-
-            if (analogRead(HOMING0) > 1000) {
+            control_motor(MOTOR0_EN, MOTOR0_MIN_MOVE_PWM);
+            if (digitalRead(HOMING0)) {
                 g_state = s_home_q1;
                 stop_all();
 
@@ -230,13 +219,8 @@ void loop() {
         break;
         case s_home_q1:
             // This state should move motor 1 until it is homed
-            control_motor(MOTOR1_EN, 140);
-
-            // Put yaw motor to position 0
-            apply_control(true);
-
-            // Poll for when laser hits the sensor
-            if (analogRead(HOMING1) > 500) {
+            control_motor(MOTOR1_EN, MOTOR1_MIN_MOVE_PWM);
+            if (digitalRead(HOMING1)) {
                 g_state = s_listen;
                 stop_all();
 
@@ -245,11 +229,8 @@ void loop() {
             }
         break;
         case s_listen:
-            #ifndef _SKIP_SHAPE
             if (Serial.available()) {
                 char in = Serial.read();
-
-                // Controller to do certain tasks when listening
                 switch(in) {
                     case PARSE_ARRAY:
                         g_n_vertices = parse_array(&g_vertices_x, &g_vertices_y, &g_vertices_time);
@@ -259,27 +240,14 @@ void loop() {
                             g_state = s_draw;
                         };
                     break;
-                    case IMMEDIATE_POS:
-                        // TODO:
-                    break;
                 }
             }
-            #endif
 
-            // FIXME:
-            g_state = s_draw;
         break;
         case s_draw:
 
             // Normal controller code
-            apply_control(false);
-
-            // Check for stop signal
-            if (Serial.available()) {
-                if (Serial.read() == STOP_DRAW) {
-                    g_state = s_listen;
-                }
-            }
+            apply_control();
         break;
         default:
             // Should never be here, reset if needed
@@ -295,36 +263,29 @@ void loop() {
  *
  * EXEC TIME: 20us
  */
-void control_motor(char motor, long pwm) {
+void control_motor(char motor, int pwm) {
     if (motor == MOTOR0_EN) {
 
         // Set direction of motor movement
-        if (pwm > 0) {
-            digitalWrite(MOTOR0_DIRECA, HIGH);
-            digitalWrite(MOTOR0_DIRECB, LOW);
-        } else {
-            digitalWrite(MOTOR0_DIRECA, LOW);
-            digitalWrite(MOTOR0_DIRECB, HIGH);
-        }
+        digitalWrite(MOTOR0_DIREC, pwm > 0);
 
         // Set pwm
+        #ifdef USE_PWM_FLOOR
         pwm = constrain(abs(pwm), PWM_FLOOR, 255);
-        Serial.println(pwm, DEC);
+        #else
+        pwm = abs(pwm);
+        #endif
 
         // Write to pin
         analogWrite(MOTOR0_EN, pwm);
         
     } else if (motor == MOTOR1_EN) {
-
-        if (pwm > 0) {
-            digitalWrite(MOTOR1_DIRECA, HIGH);
-            digitalWrite(MOTOR1_DIRECB, LOW);
-        } else {
-            digitalWrite(MOTOR1_DIRECA, LOW);
-            digitalWrite(MOTOR1_DIRECB, HIGH);
-        }
-
+        digitalWrite(MOTOR1_DIREC, pwm > 0);
+        #ifdef USE_PWM_FLOOR
         pwm = constrain(abs(pwm), PWM_FLOOR, 255);
+        #else
+        pwm = abs(pwm);
+        #endif
         analogWrite(MOTOR1_EN, pwm);
     }
 }
@@ -339,24 +300,12 @@ inline void stop_all() {
 }
 
 /* Apply the PID control to both motors
- * TODO: the desired positions be abstracted outside of this function
  *
  * EXEC TIME: 190us
  */
-inline void apply_control(bool is_homing) {
+inline void apply_control() {
     // Only control when control flag is set to true
     if (!vg_control_flag) return;
-
-    // Only apply a specific position to q0
-    if (is_homing) {
-        int q0_error = -vg_q0_pos;
-        g_q0_accum_error += q0_error;
-
-        long q0_pwm = long((K_P0 * q0_error) + (K_D0 * vg_q0_speed) + (K_I0 * g_q0_accum_error));
-        control_motor(MOTOR0_EN, q0_pwm);
-
-        return;
-    }
     
     // Check that vertices array is well-formed
     if (g_vertices_x == NULL || g_vertices_y == NULL || g_vertices_time == NULL || g_n_vertices <= 0) return;
@@ -385,22 +334,12 @@ inline void apply_control(bool is_homing) {
     g_q1_accum_error += q1_error;
 
     // Compute signed PWM
-    long q0_pwm = long((K_P0 * q0_error) + (K_D0 * vg_q0_speed) + (K_I0 * g_q0_accum_error));
-    long q1_pwm = long((K_P1 * q1_error) + (K_D1 * vg_q1_speed) + (K_I1 * g_q1_accum_error));
-
-    #ifdef _SERIAL_DEBUG
-    Serial.print(q0_desired, DEC);
-    Serial.print(' ');
-    Serial.print(vg_q0_pos, DEC);
-    Serial.print(' ');
-    Serial.print(q0_pwm, DEC);
-    Serial.print(' ');
-    #endif
+    int q0_pwm = int((K_P0 * q0_error) + (K_D0 * vg_q0_speed) + (K_I0 * g_q0_accum_error));
+    int q1_pwm = int((K_P1 * q1_error) + (K_D1 * vg_q1_speed) + (K_I1 * g_q1_accum_error));
 
     // Send pwm to motors
     control_motor(MOTOR0_EN, q0_pwm);
     control_motor(MOTOR1_EN, q1_pwm);
-
 
     // Reset control flag
     vg_control_flag = false;

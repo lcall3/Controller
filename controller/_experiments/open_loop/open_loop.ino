@@ -150,8 +150,8 @@ void loop() {
 
         // Write to motor
         analogWrite(Q0_EN_PIN, pwm);
-        digitalWrite(Q0_DIR_A, HIGH);
-        digitalWrite(Q0_DIR_B, LOW);
+        digitalWrite(Q0_DIR_A, LOW);
+        digitalWrite(Q0_DIR_B, HIGH);
     }
     #endif
 }

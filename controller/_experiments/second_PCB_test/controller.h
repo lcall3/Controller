@@ -28,13 +28,12 @@
 #include <Arduino.h>
 
 // [*] Q0 and Q1 PID gain
-#define K_P0 10.5f
-#define K_I0 0.005f
-#define K_D0 -10.0f
-
-#define K_P1 10.0f
-#define K_I1 0.001f
-#define K_D1 -10.0f
+#define K_P0 1.0f
+#define K_I0 0.0f
+#define K_D0 0.0f
+#define K_P1 1.0f
+#define K_I1 0.0f
+#define K_D1 0.0f
 
 // [*] Range of motion in pulses
 #define YAW_MIN -100
@@ -43,8 +42,8 @@
 #define PITCH_MAX 50
 
 // [*] Homing offsets: when motors touche homing switches, the position is reset to these values
-#define YAW_HOME_OFFSET 40
-#define PITCH_HOME_OFFSET 50
+#define YAW_HOME_OFFSET -100
+#define PITCH_HOME_OFFSET -50
 
 // [*]
 #define USE_SERIAL
@@ -63,7 +62,7 @@
 
 // [*]
 #ifdef USE_PWM_FLOOR
-#define PWM_FLOOR 120
+#define PWM_FLOOR 30
 #endif
 
 // ISR functions
@@ -104,17 +103,19 @@ long g_q1_accum_error;
 volatile unsigned long vg_time_vector_count;
 
 // ISR timed control flags
+#ifdef USE_SERIAL
+volatile char vg_output_serial;
+#endif
 volatile char vg_control_flag;
-volatile char vg_output_serial_flag;
 
 // Main state machine
 enum states {s_idle, s_home_q0, s_home_q1, s_listen, s_draw};
 char g_state;
 
 // === === ===[ Function prototypes ]=== === ===
-void control_motor(char, long);
+void control_motor(char, int);
 void stop_all();
-void apply_control(bool is_homing);
+void apply_control();
 void compute_vertices(const float *, const float *, int *, int *);
 
 #endif
