@@ -28,13 +28,13 @@
 #include "experimental.h"
 #include "communicate.h"
 
-#define _SKIP_SHAPE
-// #define _SERIAL_DEBUG
+//#define _SKIP_SHAPE
+//#define _SERIAL_DEBUG
 
 #ifdef _SKIP_SHAPE
 int g_vertices_x[] = { 10, 10, -10, -10 };
 int g_vertices_y[] = { -20, 20, 20, -20 };
-unsigned int g_vertices_time[] = { 500, 500, 500, 500 };
+unsigned int g_vertices_time[] = { 100, 100, 100, 100 };
 unsigned char g_n_vertices = 4;
 #else
 // Shape array
@@ -207,10 +207,10 @@ void setup() {
  */
 char test;
 void loop() {
-    #ifdef _SERIAL_DEBUG
-    Serial.print(g_state, DEC);
-    Serial.print(' ');
-    #endif
+//    #ifdef _SERIAL_DEBUG
+//    Serial.print(g_state, DEC);
+//    Serial.print(' ');
+//    #endif
 
     switch(g_state) {
         case s_idle:
@@ -221,7 +221,7 @@ void loop() {
             control_motor(MOTOR0_EN, 120);
 
             if (analogRead(HOMING0) > 1000) {
-                g_state = s_home_q1;
+                g_state = s_listen; //g_state = s_home_q1;
                 stop_all();
 
                 // Reset position
@@ -230,7 +230,7 @@ void loop() {
         break;
         case s_home_q1:
             // This state should move motor 1 until it is homed
-            control_motor(MOTOR1_EN, 140);
+            control_motor(MOTOR1_EN, -220);
 
             // Put yaw motor to position 0
             apply_control(true);
@@ -241,7 +241,7 @@ void loop() {
                 stop_all();
 
                 // Rest position
-                vg_q1_pos = PITCH_HOME_OFFSET;
+                vg_q1_pos = -PITCH_HOME_OFFSET;
             }
         break;
         case s_listen:
@@ -309,7 +309,10 @@ void control_motor(char motor, long pwm) {
 
         // Set pwm
         pwm = constrain(abs(pwm), PWM_FLOOR, 255);
+
+        #ifdef _SERIAL_DEBUG
         Serial.println(pwm, DEC);
+        #endif
 
         // Write to pin
         analogWrite(MOTOR0_EN, pwm);
@@ -389,11 +392,11 @@ inline void apply_control(bool is_homing) {
     long q1_pwm = long((K_P1 * q1_error) + (K_D1 * vg_q1_speed) + (K_I1 * g_q1_accum_error));
 
     #ifdef _SERIAL_DEBUG
-    Serial.print(q0_desired, DEC);
+    Serial.print(q1_desired, DEC);
     Serial.print(' ');
-    Serial.print(vg_q0_pos, DEC);
+    Serial.print(vg_q1_pos, DEC);
     Serial.print(' ');
-    Serial.print(q0_pwm, DEC);
+    Serial.print(q1_pwm, DEC);
     Serial.print(' ');
     #endif
 

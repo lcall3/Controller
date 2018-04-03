@@ -32,6 +32,7 @@
 #define PARSE_ARRAY '#'
 
 #define STOP_DRAW '$'
+#define IMMEDIATE_POS '*'
 
 int parse_array (int **x, int **y, unsigned int **t);
 
