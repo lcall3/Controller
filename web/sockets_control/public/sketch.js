@@ -63,10 +63,10 @@ const accel_lim = 0.09;
 const vel_decay = 0.4;
 
 // Screen coords to pulse coords mapping constants
-const YAW_MIN = -100;
-const YAW_MAX = 100;
-const PITCH_MIN = -50;
-const PITCH_MAX = 50;
+const YAW_MIN = -30;
+const YAW_MAX = 30;
+const PITCH_MIN = -30;
+const PITCH_MAX = 30;
 
 // SCP
 const SCP = {
