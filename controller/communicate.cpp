@@ -24,7 +24,7 @@
 #include "communicate.h"
 #include <Arduino.h>
 
-int parse_array ( int **x, int **y, unsigned int **t) {
+int parse_array ( int **x, int **y, unsigned int **t, unsigned char **laser) {
     // input byte from serial port
     char inputByte;
 
@@ -63,11 +63,17 @@ int parse_array ( int **x, int **y, unsigned int **t) {
                 free(*x);
                 free(*y);
                 free(*t);
+                free(*laser);
 
                 // allocate array memory
                 *x = (int *) malloc(arrayLength * (sizeof(int)));
                 *y = (int *) malloc(arrayLength * (sizeof(int)));
                 *t = (unsigned int *) malloc(arrayLength * (sizeof(unsigned int)));
+                *laser = (unsigned char *) malloc(arrayLength * (sizeof(unsigned char)));
+
+                for (int i = 0; i < arrayLength; i++) {
+                  *(*laser + index) = 1;
+                }
             }
 
             // start of next value

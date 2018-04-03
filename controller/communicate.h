@@ -34,7 +34,7 @@
 #define STOP_DRAW '$'
 #define IMMEDIATE_POS '*'
 
-int parse_array (int **x, int **y, unsigned int **t);
+int parse_array (int **x, int **y, unsigned int **t, unsigned char **laser);
 
 enum {
     rm_length,
