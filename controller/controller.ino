@@ -28,7 +28,7 @@
 #include "experimental.h"
 #include "communicate.h"
 
-#define _SKIP_SHAPE
+// #define _SKIP_SHAPE
 // #define _SERIAL_DEBUG
 
 #ifdef _SKIP_SHAPE
@@ -265,9 +265,6 @@ void loop() {
                 }
             }
             #endif
-
-            // FIXME:
-            g_state = s_draw;
         break;
         case s_draw:
 

@@ -28,7 +28,7 @@ function socketEmit(cmd, data) {
 var isMobile = false;
 var toggleMobileEmit = false;
 var drawLaser = true;
-var mouseDrawEnabled = true;
+var mouseDrawEnabled = false;
 
 // detect mobile rotation
 var angle_alpha = 0;
