@@ -32,9 +32,9 @@
 #define K_I0 0.005f
 #define K_D0 -10.0f
 
-#define K_P1 10.0f
+#define K_P1 2.0f
 #define K_I1 0.001f
-#define K_D1 -10.0f
+#define K_D1 -5.0f
 
 // [*] Range of motion in pulses
 #define YAW_MIN -100
